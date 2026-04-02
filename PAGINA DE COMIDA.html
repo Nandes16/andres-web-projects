@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<title>Food Delivery Pro</title>
+
+<style>
+body {
+  font-family: Arial;
+  margin: 0;
+  background: #f4f4f4;
+}
+
+header {
+  background: #ff5722;
+  color: white;
+  text-align: center;
+  padding: 20px;
+}
+
+.container {
+  padding: 20px;
+}
+
+/* CATEGORÍAS */
+.categorias {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.categorias button {
+  margin: 5px;
+  background: #333;
+}
+
+/* PRODUCTOS */
+.productos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.card {
+  background: white;
+  width: 220px;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.card img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+}
+
+button {
+  background: green;
+  color: white;
+  border: none;
+  padding: 8px;
+  margin: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+/* CARRITO */
+.carrito {
+  background: white;
+  margin: 20px;
+  padding: 20px;
+  border-radius: 10px;
+}
+
+.item {
+  display: flex;
+  justify-content: space-between;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>🍔 Food Delivery Pro</h1>
+</header>
+
+<div class="container">
+
+  <!-- CATEGORÍAS -->
+  <div class="categorias">
+    <button onclick="filtrar('todos')">Todos</button>
+    <button onclick="filtrar('rapida')">Comida Rápida</button>
+    <button onclick="filtrar('bebidas')">Bebidas</button>
+    <button onclick="filtrar('postres')">Postres</button>
+  </div>
+
+  <!-- PRODUCTOS -->
+  <div class="productos" id="productos"></div>
+
+  <!-- CARRITO -->
+  <div class="carrito">
+    <h2>🛒 Carrito</h2>
+    <div id="lista"></div>
+    <h3>Total: $<span id="total">0</span></h3>
+    <button onclick="vaciar()">Vaciar</button>
+    <button onclick="comprar()">Comprar</button>
+  </div>
+
+</div>
+
+<script>
+
+const productos = [
+  {nombre:"Hamburguesa", precio:10000, cat:"rapida", img:"https://source.unsplash.com/300x200/?burger"},
+  {nombre:"Hot Dog", precio:7000, cat:"rapida", img:"https://source.unsplash.com/300x200/?hotdog"},
+  {nombre:"Pizza", precio:12000, cat:"rapida", img:"https://source.unsplash.com/300x200/?pizza"},
+  {nombre:"Papas", precio:5000, cat:"rapida", img:"https://source.unsplash.com/300x200/?fries"},
+
+  {nombre:"Gaseosa", precio:4000, cat:"bebidas", img:"https://source.unsplash.com/300x200/?soda"},
+  {nombre:"Jugo Natural", precio:6000, cat:"bebidas", img:"https://source.unsplash.com/300x200/?juice"},
+
+  {nombre:"Helado", precio:5000, cat:"postres", img:"https://source.unsplash.com/300x200/?icecream"},
+  {nombre:"Brownie", precio:6000, cat:"postres", img:"https://source.unsplash.com/300x200/?brownie"}
+];
+
+let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+
+function mostrarProductos(filtro="todos") {
+  let cont = document.getElementById("productos");
+  cont.innerHTML = "";
+
+  productos.forEach(p => {
+    if (filtro === "todos" || p.cat === filtro) {
+      cont.innerHTML += `
+        <div class="card">
+          <img src="${p.img}">
+          <h3>${p.nombre}</h3>
+          <p>$${p.precio}</p>
+          <button onclick="agregar('${p.nombre}', ${p.precio})">Agregar</button>
+        </div>
+      `;
+    }
+  });
+}
+
+function filtrar(cat) {
+  mostrarProductos(cat);
+}
+
+function agregar(nombre, precio) {
+  carrito.push({nombre, precio});
+  guardar();
+  mostrarCarrito();
+}
+
+function mostrarCarrito() {
+  let lista = document.getElementById("lista");
+  lista.innerHTML = "";
+  let total = 0;
+
+  carrito.forEach((p,i)=>{
+    total += p.precio;
+
+    lista.innerHTML += `
+      <div class="item">
+        ${p.nombre} - $${p.precio}
+        <button onclick="eliminar(${i})">❌</button>
+      </div>
+    `;
+  });
+
+  document.getElementById("total").textContent = total;
+}
+
+function eliminar(i) {
+  carrito.splice(i,1);
+  guardar();
+  mostrarCarrito();
+}
+
+function vaciar() {
+  carrito = [];
+  guardar();
+  mostrarCarrito();
+}
+
+function guardar() {
+  localStorage.setItem("carrito", JSON.stringify(carrito));
+}
+
+function comprar() {
+  let mensaje = "Hola, quiero pedir:%0A";
+
+  carrito.forEach(p=>{
+    mensaje += `- ${p.nombre} $${p.precio}%0A`;
+  });
+
+  let numero = "573000000000";
+
+  window.open(`https://wa.me/${numero}?text=${mensaje}`);
+}
+
+mostrarProductos();
+mostrarCarrito();
+
+</script>
+
+</body>
+</html>
