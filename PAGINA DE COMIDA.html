@@ -1,211 +1,291 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Food Delivery Pro</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Food Delivery Pro | Enterprise v2</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #ff5722;
+            --dark: #1a1a1a;
+            --light: #ffffff;
+            --success: #2ecc71;
+            --admin-color: #673ab7;
+            --accent: #00bcd4;
+            --bg: #f0f2f5;
+        }
 
-<style>
-body {
-  font-family: Arial;
-  margin: 0;
-  background: #f4f4f4;
-}
+        body { font-family: 'Poppins', sans-serif; margin: 0; background: var(--bg); color: var(--dark); }
+        
+        /* --- LOGIN INTERFACE --- */
+        #login-screen {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--dark); display: flex; justify-content: center; align-items: center;
+            z-index: 1000; color: white;
+        }
+        .login-box { background: white; padding: 40px; border-radius: 20px; color: var(--dark); text-align: center; width: 300px; }
+        .login-box input { width: 100%; padding: 12px; margin: 15px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
+        
+        header { 
+            background: var(--dark); color: white; text-align: center; 
+            padding: 20px; border-bottom: 5px solid var(--primary); 
+        }
 
-header {
-  background: #ff5722;
-  color: white;
-  text-align: center;
-  padding: 20px;
-}
+        .user-info { background: #eee; padding: 5px 20px; font-size: 0.8rem; display: flex; justify-content: space-between; align-items: center; }
 
-.container {
-  padding: 20px;
-}
+        .nav-toggle { display: flex; justify-content: center; gap: 10px; padding: 20px; background: #fff; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
 
-/* CATEGORÍAS */
-.categorias {
-  text-align: center;
-  margin-bottom: 20px;
-}
+        .btn-view { padding: 10px 25px; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .active-view { background: var(--primary); color: white; }
 
-.categorias button {
-  margin: 5px;
-  background: #333;
-}
+        .container { max-width: 1100px; margin: auto; padding: 20px; }
 
-/* PRODUCTOS */
-.productos {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 20px;
-  justify-content: center;
-}
+        .section { display: none; }
+        .visible { display: block !important; }
 
-.card {
-  background: white;
-  width: 220px;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
-  text-align: center;
-}
+        /* CARDS & INGREDIENTS */
+        .productos { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px; }
+        .card { background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.08); }
+        .card-info { padding: 15px; }
+        .ingredientes { font-size: 0.75rem; color: #666; font-style: italic; margin-bottom: 10px; min-height: 35px; }
+        
+        /* ADMIN */
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 15px; }
+        .stat-card { background: white; padding: 20px; border-radius: 12px; text-align: center; border-top: 4px solid var(--admin-color); }
+        .admin-form { background: white; padding: 25px; border-radius: 15px; margin-bottom: 30px; }
+        .admin-form input, .admin-form select, .admin-form textarea { width: 100%; padding: 12px; margin: 10px 0; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; }
 
-.card img {
-  width: 100%;
-  height: 140px;
-  object-fit: cover;
-}
-
-button {
-  background: green;
-  color: white;
-  border: none;
-  padding: 8px;
-  margin: 5px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-/* CARRITO */
-.carrito {
-  background: white;
-  margin: 20px;
-  padding: 20px;
-  border-radius: 10px;
-}
-
-.item {
-  display: flex;
-  justify-content: space-between;
-}
-</style>
+        .btn-confirm { background: var(--success); width: 100%; padding: 15px; border-radius: 8px; color: white; border: none; font-weight: bold; cursor: pointer; margin-top: 15px; }
+        .btn-danger { background: #ff4757; color: white; padding: 10px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
+    </style>
 </head>
-
 <body>
 
-<header>
-  <h1>🍔 Food Delivery Pro</h1>
-</header>
+<div id="login-screen">
+    <div class="login-box">
+        <h2>Bienvenido</h2>
+        <p>Ingresa tu nombre de usuario</p>
+        <input type="text" id="username" placeholder="Ej: Juan o Admin*">
+        <button class="btn-view active-view" style="width: 100%" onclick="intentarLogin()">Entrar</button>
+        <p style="font-size: 0.7rem; color: #999; margin-top: 10px;">* Tip: Nombres con "*" acceden como Admin</p>
+    </div>
+</div>
 
-<div class="container">
+<div id="app-content" style="display: none;">
+    <header>
+        <h1>🍕 FOOD DELIVERY PRO</h1>
+    </header>
+    
+    <div class="user-info">
+        <span id="user-display">Usuario: </span>
+        <button onclick="location.reload()" style="border:none; background:none; cursor:pointer; color:red;">Cerrar Sesión</button>
+    </div>
 
-  <!-- CATEGORÍAS -->
-  <div class="categorias">
-    <button onclick="filtrar('todos')">Todos</button>
-    <button onclick="filtrar('rapida')">Comida Rápida</button>
-    <button onclick="filtrar('bebidas')">Bebidas</button>
-    <button onclick="filtrar('postres')">Postres</button>
-  </div>
+    <div class="nav-toggle">
+        <button id="nav-cliente" class="btn-view active-view" onclick="cambiarVista('cliente')">🛒 Tienda</button>
+        <button id="nav-admin" class="btn-view" onclick="cambiarVista('admin')" style="display: none;">⚙️ Panel Admin</button>
+    </div>
 
-  <!-- PRODUCTOS -->
-  <div class="productos" id="productos"></div>
+    <div class="container">
+        <!-- VISTA ADMIN -->
+        <div id="vista-admin" class="section">
+            <h2 style="color: var(--admin-color);">📊 Dashboard Administrativo</h2>
+            
+            <div class="stats-grid">
+                <div class="stat-card"><h4>Ventas Totales</h4><p id="stat-ventas" style="font-size: 1.5rem; font-weight: bold; color: var(--success);">$0</p></div>
+                <div class="stat-card"><h4>Pedidos Realizados</h4><p id="stat-pedidos" style="font-size: 1.5rem; font-weight: bold;">0</p></div>
+            </div>
 
-  <!-- CARRITO -->
-  <div class="carrito">
-    <h2>🛒 Carrito</h2>
-    <div id="lista"></div>
-    <h3>Total: $<span id="total">0</span></h3>
-    <button onclick="vaciar()">Vaciar</button>
-    <button onclick="comprar()">Comprar</button>
-  </div>
+            <div style="text-align: right; margin-bottom: 25px;">
+                <button class="btn-danger" onclick="borrarHistorial()">🗑️ Borrar Todo el Historial</button>
+            </div>
 
+            <div class="admin-form">
+                <h3>➕ Añadir Nuevo Producto</h3>
+                <input type="text" id="adm-nombre" placeholder="Nombre del producto">
+                <textarea id="adm-ing" placeholder="Ingredientes (separados por coma)"></textarea>
+                <input type="number" id="adm-precio" placeholder="Precio ($)">
+                <select id="adm-cat">
+                    <option value="rapida">Comida Rápida</option>
+                    <option value="bebidas">Bebida</option>
+                    <option value="postres">Postre</option>
+                </select>
+                <input type="text" id="adm-img" placeholder="URL de la imagen">
+                <button class="btn-view active-view" style="width:100%; background: var(--admin-color);" onclick="nuevoProducto()">Guardar Producto</button>
+            </div>
+        </div>
+
+        <!-- VISTA CLIENTE -->
+        <div id="vista-cliente" class="section visible">
+            <div class="categorias" style="text-align: center; margin-bottom: 20px;">
+                <button class="btn-view" onclick="renderTienda('todos')">Todos</button>
+                <button class="btn-view" onclick="renderTienda('rapida')">Rápida</button>
+                <button class="btn-view" onclick="renderTienda('bebidas')">Bebidas</button>
+                <button class="btn-view" onclick="renderTienda('postres')">Postres</button>
+            </div>
+
+            <div class="productos" id="productos-grid"></div>
+
+            <div class="carrito" style="background: var(--dark); color: white; padding: 20px; border-radius: 15px; margin-top: 30px;">
+                <h2>🛒 Tu Pedido</h2>
+                <div id="lista-carrito"></div>
+                <h3 style="text-align: right; border-top: 1px solid #444; padding-top: 10px;">Total: $<span id="total-txt">0</span></h3>
+                <button class="btn-confirm" onclick="finalizarCompra()">Confirmar y enviar WhatsApp</button>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
+// --- CONFIGURACIÓN ---
+const TELEFONO_WHATSAPP = "573001234567"; // CAMBIA ESTO CON TU NÚMERO
 
-const productos = [
-  {nombre:"Hamburguesa", precio:10000, cat:"rapida", img:"https://source.unsplash.com/300x200/?burger"},
-  {nombre:"Hot Dog", precio:7000, cat:"rapida", img:"https://source.unsplash.com/300x200/?hotdog"},
-  {nombre:"Pizza", precio:12000, cat:"rapida", img:"https://source.unsplash.com/300x200/?pizza"},
-  {nombre:"Papas", precio:5000, cat:"rapida", img:"https://source.unsplash.com/300x200/?fries"},
-
-  {nombre:"Gaseosa", precio:4000, cat:"bebidas", img:"https://source.unsplash.com/300x200/?soda"},
-  {nombre:"Jugo Natural", precio:6000, cat:"bebidas", img:"https://source.unsplash.com/300x200/?juice"},
-
-  {nombre:"Helado", precio:5000, cat:"postres", img:"https://source.unsplash.com/300x200/?icecream"},
-  {nombre:"Brownie", precio:6000, cat:"postres", img:"https://source.unsplash.com/300x200/?brownie"}
+const dbInicial = [
+    {id:1, nombre:"Burger Doble", precio:15000, cat:"rapida", ing:"Doble carne de res, queso cheddar, tocino, lechuga, tomate", img:"https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=300"},
+    {id:2, nombre:"Pizza Familiar", precio:35000, cat:"rapida", ing:"Masa artesanal, pepperoni, mozzarella, salsa pomodoro", img:"https://images.unsplash.com/photo-1628840042765-356cda07504e?w=300"},
+    {id:6, nombre:"Limonada Cerezada", precio:8000, cat:"bebidas", ing:"Limones frescos, almíbar de cereza, hielo frappé", img:"https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=300"},
+    {id:11, nombre:"Brownie Melcochudo", precio:7000, cat:"postres", ing:"Chocolate oscuro, nueces, centro líquido, helado", img:"https://images.unsplash.com/photo-1541783245831-57d6fb0926d3?w=300"}
 ];
 
-let carrito = JSON.parse(localStorage.getItem("carrito")) || [];
+let productos = JSON.parse(localStorage.getItem("prods_v2")) || dbInicial;
+let pedidos = JSON.parse(localStorage.getItem("pedidos_v2")) || [];
+let carrito = [];
+let usuarioLogueado = "";
 
-function mostrarProductos(filtro="todos") {
-  let cont = document.getElementById("productos");
-  cont.innerHTML = "";
+// --- LOGIN ---
+function intentarLogin() {
+    const nombre = document.getElementById("username").value.trim();
+    if (!nombre) return alert("Ingresa un nombre");
 
-  productos.forEach(p => {
-    if (filtro === "todos" || p.cat === filtro) {
-      cont.innerHTML += `
-        <div class="card">
-          <img src="${p.img}">
-          <h3>${p.nombre}</h3>
-          <p>$${p.precio}</p>
-          <button onclick="agregar('${p.nombre}', ${p.precio})">Agregar</button>
-        </div>
-      `;
+    usuarioLogueado = nombre;
+    document.getElementById("login-screen").style.display = "none";
+    document.getElementById("app-content").style.display = "block";
+    document.getElementById("user-display").textContent = `Usuario: ${nombre}`;
+
+    if (nombre.includes("*")) {
+        document.getElementById("nav-admin").style.display = "block";
+    } else {
+        document.getElementById("nav-admin").style.display = "none";
     }
-  });
+    renderTienda();
 }
 
-function filtrar(cat) {
-  mostrarProductos(cat);
+function cambiarVista(vista) {
+    document.querySelectorAll('.section').forEach(s => s.classList.remove('visible'));
+    document.querySelectorAll('.nav-toggle .btn-view').forEach(b => b.classList.remove('active-view'));
+    document.getElementById(`vista-${vista}`).classList.add('visible');
+    document.getElementById(`nav-${vista}`).classList.add('active-view');
+    if(vista === 'admin') actualizarDashboard();
 }
 
-function agregar(nombre, precio) {
-  carrito.push({nombre, precio});
-  guardar();
-  mostrarCarrito();
+// --- TIENDA ---
+function renderTienda(filtro = "todos") {
+    const grid = document.getElementById("productos-grid");
+    const filtrados = productos.filter(p => filtro === "todos" || p.cat === filtro);
+    grid.innerHTML = filtrados.map(p => `
+        <div class="card">
+            <img src="${p.img}" style="width:100%; height:150px; object-fit:cover;">
+            <div class="card-info">
+                <h3 style="margin:0;">${p.nombre}</h3>
+                <p class="ingredientes"><strong>Ingredientes:</strong> ${p.ing || 'No especificados'}</p>
+                <p style="color:var(--primary); font-weight:bold; font-size:1.2rem">$${p.precio.toLocaleString()}</p>
+                <button class="btn-confirm" style="margin:0;" onclick="alCarrito(${p.id})">Agregar</button>
+            </div>
+        </div>
+    `).join('');
 }
 
-function mostrarCarrito() {
-  let lista = document.getElementById("lista");
-  lista.innerHTML = "";
-  let total = 0;
-
-  carrito.forEach((p,i)=>{
-    total += p.precio;
-
-    lista.innerHTML += `
-      <div class="item">
-        ${p.nombre} - $${p.precio}
-        <button onclick="eliminar(${i})">❌</button>
-      </div>
-    `;
-  });
-
-  document.getElementById("total").textContent = total;
+function alCarrito(id) {
+    const prod = productos.find(p => p.id === id);
+    carrito.push(prod);
+    actualizarCarrito();
 }
 
-function eliminar(i) {
-  carrito.splice(i,1);
-  guardar();
-  mostrarCarrito();
+function actualizarCarrito() {
+    const lista = document.getElementById("lista-carrito");
+    let total = 0;
+    lista.innerHTML = carrito.map((p, i) => {
+        total += p.precio;
+        return `<div style="display:flex; justify-content:space-between; margin: 8px 0; font-size:0.9rem">
+            <span>${p.nombre}</span>
+            <span>$${p.precio.toLocaleString()} <button onclick="quitar(${i})" style="background:none; border:none; color:#ff5722; cursor:pointer;">✕</button></span>
+        </div>`;
+    }).join('');
+    document.getElementById("total-txt").textContent = total.toLocaleString();
 }
 
-function vaciar() {
-  carrito = [];
-  guardar();
-  mostrarCarrito();
+function quitar(idx) {
+    carrito.splice(idx, 1);
+    actualizarCarrito();
 }
 
-function guardar() {
-  localStorage.setItem("carrito", JSON.stringify(carrito));
+// --- FINALIZAR COMPRA (WHATSAPP) ---
+function finalizarCompra() {
+    if(carrito.length === 0) return alert("El carrito está vacío");
+    
+    const total = carrito.reduce((s, p) => s + p.precio, 0);
+    const fecha = new Date().toLocaleString();
+    
+    // Crear Factura
+    let mensaje = `*🧾 FACTURA DE PEDIDO*\n`;
+    mensaje += `--------------------------------\n`;
+    mensaje += `*Cliente:* ${usuarioLogueado}\n`;
+    mensaje += `*Fecha:* ${fecha}\n`;
+    mensaje += `--------------------------------\n`;
+    mensaje += `*Productos:*\n`;
+    carrito.forEach((p, i) => {
+        mensaje += `${i+1}. ${p.nombre} ($${p.precio.toLocaleString()})\n`;
+    });
+    mensaje += `--------------------------------\n`;
+    mensaje += `*TOTAL: $${total.toLocaleString()}*\n`;
+    mensaje += `--------------------------------\n`;
+    mensaje += `_Enviado desde Food Delivery Pro_`;
+
+    // Guardar en historial
+    pedidos.push({ id: Date.now(), fecha: fecha, total: total, user: usuarioLogueado });
+    localStorage.setItem("pedidos_v2", JSON.stringify(pedidos));
+
+    // Abrir WhatsApp
+    const url = `https://wa.me/${TELEFONO_WHATSAPP}?text=${encodeURIComponent(mensaje)}`;
+    window.open(url, '_blank');
+
+    // Resetear
+    carrito = [];
+    actualizarCarrito();
+    alert("¡Pedido enviado!");
 }
 
-function comprar() {
-  let mensaje = "Hola, quiero pedir:%0A";
+// --- LÓGICA ADMIN ---
+function nuevoProducto() {
+    const n = document.getElementById("adm-nombre").value;
+    const ing = document.getElementById("adm-ing").value;
+    const p = document.getElementById("adm-precio").value;
+    const c = document.getElementById("adm-cat").value;
+    const i = document.getElementById("adm-img").value || "https://images.unsplash.com/photo-1495147466023-ac5c588e2e94?w=300";
 
-  carrito.forEach(p=>{
-    mensaje += `- ${p.nombre} $${p.precio}%0A`;
-  });
+    if(!n || !p) return alert("Nombre y precio son obligatorios");
 
-  let numero = "573000000000";
-
-  window.open(`https://wa.me/${numero}?text=${mensaje}`);
+    productos.push({ id: Date.now(), nombre: n, ing: ing, precio: parseInt(p), cat: c, img: i });
+    localStorage.setItem("prods_v2", JSON.stringify(productos));
+    alert("Producto Guardado");
+    actualizarDashboard();
 }
 
-mostrarProductos();
-mostrarCarrito();
+function actualizarDashboard() {
+    const totalVentas = pedidos.reduce((sum, ped) => sum + ped.total, 0);
+    document.getElementById("stat-ventas").textContent = `$${totalVentas.toLocaleString()}`;
+    document.getElementById("stat-pedidos").textContent = pedidos.length;
+}
 
+function borrarHistorial() {
+    if (confirm("¿ESTÁS SEGURO? Se borrarán todas las ventas y el contador volverá a $0.")) {
+        pedidos = []; // Vaciar array
+        localStorage.setItem("pedidos_v2", JSON.stringify(pedidos)); // Guardar vacío
+        actualizarDashboard(); // Actualizar pantalla
+        alert("Historial borrado con éxito.");
+    }
+}
 </script>
 
 </body>
