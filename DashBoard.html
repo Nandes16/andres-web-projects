@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>ZenFinance | Ecosistema Financiero</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap');
+        body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.5s; }
+        .glass-card { background: rgba(255, 255, 255, 0.9); border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05); border-radius: 24px; overflow: hidden; }
+        .bg-zen-main { background-color: #e0f2f1; }
+        .bg-zen-control { background-color: #f0fdfa; }
+        .bg-zen-metas { background-color: #f0f9ff; }
+    </style>
+</head>
+<body class="p-4 md:p-8 bg-zen-main">
+
+    <div id="auth" class="max-w-md mx-auto mt-20 glass-card p-10 text-center">
+        <h1 class="text-4xl font-extrabold mb-2 text-emerald-800">ZenFinance</h1>
+        <p class="text-slate-500 mb-8">Gestión inteligente, vida tranquila.</p>
+        <input type="text" id="user-in" placeholder="Nombre de usuario" class="w-full p-4 rounded-2xl mb-4 border outline-none">
+        <input type="password" id="pass-in" placeholder="Clave de acceso" class="w-full p-4 rounded-2xl mb-8 border outline-none">
+        <button onclick="authenticate()" class="w-full bg-emerald-600 text-white py-4 rounded-2xl font-bold">Entrar al sistema</button>
+    </div>
+
+    <div id="app" class="hidden max-w-6xl mx-auto">
+        <div class="flex justify-between items-center mb-8 bg-white p-4 rounded-full shadow-sm">
+            <h2 class="font-bold text-slate-700">ZenFinance</h2>
+            <div class="flex items-center gap-2 bg-emerald-50 px-4 py-2 rounded-full">
+                <span id="user-display" class="font-bold text-emerald-800"></span>
+            </div>
+        </div>
+
+        <nav class="flex justify-center gap-2 mb-12">
+            <button onclick="showTab('main', 'bg-zen-main')" class="px-8 py-3 rounded-full bg-white font-bold text-emerald-600 border">Inicio</button>
+            <button onclick="showTab('control', 'bg-zen-control')" class="px-8 py-3 rounded-full bg-white font-bold border">Control</button>
+            <button onclick="showTab('metas', 'bg-zen-metas')" class="px-8 py-3 rounded-full bg-white font-bold border">Bolsillos</button>
+        </nav>
+
+        <div id="tab-main" class="tab-content glass-card p-8 mb-8 text-center">
+            <h1 class="text-5xl font-extrabold mb-12 text-emerald-900">Bienvenido de nuevo.</h1>
+            <p class="text-emerald-800 font-medium italic">"Tu tranquilidad financiera comienza con un pequeño paso."</p>
+            <img src="https://images.unsplash.com/photo-1506126613408-eca07ce68773?auto=format&fit=crop&w=800&q=80" class="w-full h-48 object-cover rounded-2xl mt-4">
+            <div class="grid md:grid-cols-3 gap-6 mt-8">
+                <div class="glass-card p-8"><p class="text-slate-400">Balance Neto</p><h2 id="balance-card" class="text-4xl font-bold text-emerald-600">$0</h2></div>
+                <div class="glass-card p-8"><p class="text-slate-400">Ingresos</p><h2 id="ingresos-card" class="text-4xl font-bold">$0</h2></div>
+                <div class="glass-card p-8"><p class="text-slate-400">Gastos</p><h2 id="gastos-card" class="text-4xl font-bold">$0</h2></div>
+            </div>
+        </div>
+
+        <div id="tab-control" class="tab-content hidden grid md:grid-cols-2 gap-8">
+            <div class="glass-card p-6 text-center">
+                <p class="text-slate-600 font-semibold italic text-sm">"La disciplina es el puente entre tus metas y tus logros."</p>
+                <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80" class="w-full h-32 object-cover rounded-xl mt-3">
+                <div class="mt-4"><canvas id="myChart"></canvas></div>
+            </div>
+            <div class="glass-card p-8">
+                <input type="number" id="valor" placeholder="Monto $" class="w-full p-4 border rounded-2xl mb-4">
+                <div class="flex gap-3 mb-8">
+                    <button onclick="registrar('Ingreso')" class="flex-1 bg-emerald-600 text-white py-3 rounded-2xl font-bold">Ingreso +</button>
+                    <button onclick="registrar('Gasto')" class="flex-1 bg-rose-500 text-white py-3 rounded-2xl font-bold">Gasto -</button>
+                </div>
+                <h3 class="font-bold text-sm text-slate-400 uppercase mb-3">Historial de Transacciones</h3>
+                <div id="historial" class="h-40 overflow-y-auto space-y-3 text-slate-600 text-sm border-t pt-3"></div>
+            </div>
+        </div>
+
+        <div id="tab-metas" class="tab-content hidden">
+            <div class="glass-card p-8 mb-8">
+                <p class="text-emerald-700 font-bold italic">"Los grandes sueños se alcanzan ahorrando poco a poco."</p>
+                <h2 id="total-bolsillos" class="text-4xl font-bold text-emerald-600 mt-4">$0</h2>
+            </div>
+            <div class="glass-card p-8 mb-8">
+                <input type="text" id="nombre-meta" placeholder="Nombre meta" class="p-3 border rounded-xl w-full mb-2">
+                <input type="number" id="monto-meta" placeholder="Meta $" class="p-3 border rounded-xl w-full">
+                <button onclick="crearMeta()" class="bg-slate-900 text-white w-full py-3 rounded-xl font-bold mt-4">Crear Bolsillo</button>
+            </div>
+            <div id="lista-metas" class="grid md:grid-cols-3 gap-4"></div>
+        </div>
+    </div>
+
+    <script>
+        let userData = { ingresos: 0, gastos: 0, totalBolsillos: 0, metas: [] };
+        let currentKey = "";
+
+        function authenticate() {
+            const user = document.getElementById('user-in').value;
+            const pass = document.getElementById('pass-in').value;
+            if(!user) return;
+            currentKey = "data_" + user + "_" + pass;
+            const saved = localStorage.getItem(currentKey);
+            if(saved) userData = JSON.parse(saved);
+            document.getElementById('auth').classList.add('hidden');
+            document.getElementById('app').classList.remove('hidden');
+            document.getElementById('user-display').innerText = user;
+            initChart(); actualizarUI(); renderMetas();
+        }
+
+        function showTab(t, bgClass) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+            document.getElementById('tab-'+t).classList.remove('hidden');
+            document.body.className = "p-4 md:p-8 " + bgClass;
+        }
+
+        function actualizarUI() {
+            document.getElementById('balance-card').innerText = "$" + (userData.ingresos - userData.gastos);
+            document.getElementById('ingresos-card').innerText = "$" + userData.ingresos;
+            document.getElementById('gastos-card').innerText = "$" + userData.gastos;
+            document.getElementById('total-bolsillos').innerText = "$" + userData.totalBolsillos;
+            if(window.myChart) {
+                myChart.data.datasets[0].data = [userData.ingresos, userData.gastos];
+                myChart.update();
+            }
+            localStorage.setItem(currentKey, JSON.stringify(userData));
+        }
+
+        function registrar(tipo, monto = 0, esAhorro = false) {
+            const val = esAhorro ? monto : parseFloat(document.getElementById('valor').value);
+            if(!val || val <= 0) return;
+            tipo === 'Ingreso' ? userData.ingresos += val : userData.gastos += val;
+            actualizarUI();
+        }
+
+        function crearMeta() {
+            const n = document.getElementById('nombre-meta').value;
+            const m = parseFloat(document.getElementById('monto-meta').value);
+            if(!n || !m) return;
+            userData.metas.push({ nombre: n, meta: m, ahorrado: 0 });
+            renderMetas();
+        }
+
+        function renderMetas() {
+            const lista = document.getElementById('lista-metas');
+            lista.innerHTML = "";
+            userData.metas.forEach((meta, index) => {
+                lista.innerHTML += `
+                    <div class="glass-card p-6 bg-white">
+                        <h3 class="font-bold">${meta.nombre}</h3>
+                        <p class="text-sm">Meta: $${meta.meta}</p>
+                        <button onclick="depositarMeta(${index})" class="w-full bg-emerald-600 text-white py-2 rounded-xl mt-4">Depositar</button>
+                    </div>`;
+            });
+        }
+
+        function depositarMeta(i) {
+            const m = parseFloat(prompt("¿Cuánto deseas depositar?"));
+            if(!m || m <= 0) return;
+            userData.totalBolsillos += m;
+            userData.metas[i].ahorrado += m;
+            registrar('Ahorro', m, true);
+            renderMetas();
+        }
+
+        function initChart() { window.myChart = new Chart(document.getElementById('myChart'), { type: 'doughnut', data: { labels: ['Ingresos', 'Gastos'], datasets: [{ data: [0, 0], backgroundColor: ['#10b981', '#f43f5e'] }] } }); }
+    </script>
+</body>
+</html>
