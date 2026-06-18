@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bóveda del Idioma | Estudiantes</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { font-family: 'Plus Jakarta Sans', sans-serif; transition: background 0.8s ease; background-size: cover; background-position: center; background-attachment: fixed; }
+        .badge { display: inline-block; padding: 0.5rem 1.5rem; border-radius: 9999px; font-weight: 800; border: 2px solid white; cursor: pointer; }
+        .card-cultural { background: rgba(255, 255, 255, 0.9); border-radius: 20px; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .tab-content { display: none; }
+        /* Fondos */
+        .bg-login { background-image: url('https://static.vecteezy.com/system/resources/previews/060/465/633/non_2x/cartoon-dictionary-book-icon-isolated-illustration-on-white-background-vector.jpg'); }
+        .bg-inicio { background-image: url('https://colombianabroad.com/wp-content/uploads/cuaderno-idiomas-feature.jpg'); }
+        .bg-ingles { background-image: url('https://w7.pngwing.com/pngs/24/968/png-transparent-london-british-english-language-school-london-english-london-united-kingdom-thumbnail.png'); }
+        .bg-frances { background-image: url('https://i.pinimg.com/236x/1e/fc/73/1efc73b8614aaabb56ca1c214e195f24.jpg'); }
+        .bg-italiano { background-image: url('https://blog.universaldeidiomas.com/wp-content/uploads/2019/05/frases-cotidianas-en-italiano.jpg'); }
+        .bg-portugues { background-image: url('https://img.magnific.com/vector-gratis/ilustracion-lengua-portuguesa-dibujada-mano_23-2149834176.jpg'); }
+        .bg-aleman { background-image: url('https://iaci.es/wp-content/uploads/2020/03/4-aleman-scaled.jpg'); }
+        .bg-japones { background-image: url('https://clicasia.com/wp-content/uploads/2014/08/nihongo-1024x453.jpg'); }
+        .bg-coreano { background-image: url('https://img.freepik.com/premium-vector/south-korea-flag-with-speech-balloon-silhouette-man-with-country-flag-learning-korean-language_655111-2243.jpg'); }
+        .bg-chino { background-image: url('https://e7.pngegg.com/pngimages/996/318/png-clipart-mitasu-yakiniku-lucky-chinatown-charcoal-history-of-china-text-logo.png'); }
+    </style>
+</head>
+<body class="bg-login min-h-screen p-4 md:p-6">
+
+    <div id="auth" class="max-w-md mx-auto mt-20 card-cultural p-10 text-center">
+        <h1 class="badge bg-slate-800 text-white text-2xl mb-4">Bóveda del Idioma</h1>
+        <p class="text-slate-600 mb-6">Hola estudiante, guarda tus palabras y domina nuevos mundos.</p>
+        <input type="text" id="user-in" placeholder="¿Cuál es tu nombre?" class="w-full p-3 rounded-xl mb-4 border-2">
+        <button onclick="login()" class="w-full bg-slate-800 text-white py-3 rounded-xl font-bold">Comenzar Aventura</button>
+    </div>
+
+    <div id="app" class="hidden max-w-4xl mx-auto">
+        <header class="flex justify-between items-center mb-8 bg-white p-4 rounded-full shadow-lg">
+            <h1 class="font-black text-lg px-4">Bóveda del Idioma</h1>
+            <span id="user-display" class="bg-slate-800 text-white px-6 py-2 rounded-full font-bold"></span>
+        </header>
+
+        <nav class="flex gap-2 mb-10 justify-center flex-wrap md:flex-nowrap overflow-x-auto pb-2">
+    <button onclick="showTab('inicio', 'bg-inicio')" class="badge bg-white text-slate-800">Inicio</button>
+    <button onclick="showTab('ingles', 'bg-ingles')" class="badge bg-white text-slate-800">🇺🇸 Inglés</button>
+    <button onclick="showTab('frances', 'bg-frances')" class="badge bg-white text-slate-800">🇫🇷 Francés</button>
+    <button onclick="showTab('italiano', 'bg-italiano')" class="badge bg-white text-slate-800">🇮🇹 Italiano</button>
+    <button onclick="showTab('portugues', 'bg-portugues')" class="badge bg-white text-slate-800">🇵🇹 Portugués</button>
+    <button onclick="showTab('aleman', 'bg-aleman')" class="badge bg-white text-slate-800">🇩🇪 Alemán</button>
+    <button onclick="showTab('japones', 'bg-japones')" class="badge bg-white text-slate-800">🇯🇵 Japonés</button>
+    <button onclick="showTab('coreano', 'bg-coreano')" class="badge bg-white text-slate-800">🇰🇷 Coreano</button>
+    <button onclick="showTab('chino', 'bg-chino')" class="badge bg-white text-slate-800">🇨🇳 Chino</button>
+</nav>
+
+        <div id="inicio" class="tab-content block text-center"><div class="card-cultural p-8 max-w-lg mx-auto"><h2 id="welcome-msg" class="text-2xl font-bold"></h2></div></div>
+
+        <script>
+            function crearSeccion(id, titulo, color) {
+                document.write(`
+                    <div id="${id}" class="tab-content">
+                        <h2 class="badge ${color} text-white mb-6">${titulo}</h2>
+                        <div class="card-cultural p-6 mb-6">
+                            <input id="word-${id}" placeholder="Palabra" class="w-full p-3 mb-2 border rounded-lg">
+                            <input id="def-${id}" placeholder="Tu definición manual..." class="w-full p-3 mb-2 border rounded-lg">
+                            <input id="trans-${id}" placeholder="Traducción" class="w-full p-3 mb-2 border rounded-lg bg-emerald-50">
+                            
+                            <div class="flex gap-2">
+                                <button onclick="traducir('${id}')" class="flex-1 bg-sky-600 text-white py-2 rounded-lg font-bold text-sm">🤖 Traducir con IA</button>
+                                <button onclick="guardar('${id}')" class="flex-1 bg-slate-800 text-white py-2 rounded-lg font-bold text-sm">💾 Guardar</button>
+                            </div>
+                        </div>
+                        <div id="list-${id}" class="grid md:grid-cols-2 gap-4"></div>
+                    </div>
+                `);
+            }
+            crearSeccion('ingles', '🇺🇸 Inglés', 'bg-slate-800');
+            crearSeccion('frances', '🇫🇷 Francés', 'bg-blue-800');
+            crearSeccion('italiano', '🇮🇹 Italiano', 'bg-red-800');
+            crearSeccion('portugues', '🇵🇹 Portugués', 'bg-green-800');
+            crearSeccion('aleman', '🇩🇪 Alemán', 'bg-yellow-600');
+            crearSeccion('japones', '🇯🇵 Japonés', 'bg-red-500');
+            crearSeccion('coreano', '🇰🇷 Coreano', 'bg-sky-500');
+            crearSeccion('chino', '🇨🇳 Chino', 'bg-red-600');
+        </script>
+    </div>
+
+    <script>
+        let db = { 
+    ingles: [], frances: [], italiano: [], portugues: [], 
+    aleman: [], japones: [], coreano: [], chino: [] 
+};
+        const dict = { "hello": "hola", "dog": "perro", "cat": "gato", "maison": "casa", "ciao": "hola", "bom": "bueno" };
+
+        async function traducir(id) {
+            let p = document.getElementById('word-'+id).value.toLowerCase();
+            let campoTrans = document.getElementById('trans-'+id);
+            if(!p) return alert("Escribe una palabra primero");
+            
+            if(dict[p]) {
+                campoTrans.value = dict[p];
+            } else {
+                campoTrans.value = "Consultando IA...";
+                try {
+                    let res = await fetch(`https://api.mymemory.translated.net/get?q=${p}&langpair=en|es`);
+                    let data = await res.json();
+                    campoTrans.value = data.responseData.translatedText;
+                } catch(e) { campoTrans.value = "Error al conectar IA"; }
+            }
+        }
+
+        function login() {
+            let n = document.getElementById('user-in').value;
+            if(!n) return;
+            document.getElementById('auth').classList.add('hidden');
+            document.getElementById('app').classList.remove('hidden');
+            document.getElementById('user-display').innerText = n;
+            document.getElementById('welcome-msg').innerText = "Bienvenido, " + n;
+            document.body.className = "bg-inicio min-h-screen p-6";
+        }
+
+        function showTab(id, bg) {
+            document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
+            document.getElementById(id).style.display = 'block';
+            document.body.className = bg + " min-h-screen p-6";
+        }
+
+        function guardar(id) {
+            let p = document.getElementById('word-'+id).value;
+            let t = document.getElementById('trans-'+id).value;
+            let d = document.getElementById('def-'+id).value;
+            if(!p || !t) return alert("Completa palabra y traducción");
+            document.getElementById('list-'+id).innerHTML += `
+                <div class="card-cultural p-4 border-l-4 border-emerald-500">
+                    <strong>${p}</strong> → ${t} <br> <small class="text-slate-500">${d}</small>
+                </div>`;
+            document.getElementById('word-'+id).value = "";
+            document.getElementById('trans-'+id).value = "";
+            document.getElementById('def-'+id).value = "";
+        }
+    </script>
+</body>
+</html>
