@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* 1. Fondo de toda la app (Inicio Azul) */
+    body {
+        background: radial-gradient(circle at top, #c2d4aa 0%, #ffffff 100%);
+        color: #493705; /* Texto por defecto gris oscuro para legibilidad en blanco */
+        min-height: 100vh;
+        margin: 0;
+    }
+
+    /* 2. Recuadro Inicio (Azul petróleo suave) */
+    .bg-olive-glass {
+        background: rgba(14, 116, 144, 0.85); /* Azul petróleo suave */
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        padding: 2.5rem;
+        border-radius: 2rem;
+        color: white;
+    }
+
+    /* 3. Tarjetas Dashboard (Blanco cremoso) */
+    .tarjeta-estilo {
+        background: #0d4e83 !important;
+        border: 2px solid #bae6fd; /* Borde azul muy suave */
+        padding: 2rem;
+        border-radius: 1.5rem;
+        text-align: center;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+        color: #a1bfee;
+    }
+
+    /* 4. Botones (Ámbar suave y llamativo) */
+    .btn-naranja {
+        background-color: #fb923c; /* Ámbar suave */
+        color: #ffffff;
+        font-weight: 700;
+        padding: 0.75rem 1.5rem;
+        border-radius: 1rem;
+        transition: all 0.3s ease;
+        border: none;
+    }
+    .btn-naranja:hover { background-color: #f59e0b; transform: scale(1.03); }
+
+    /* 5. Selector de Biblia (Libros) */
+    #listaLibros button {
+        background-color: #bae6fd; /* Azul hielo */
+        color: #0c4a6e;
+        border: none;
+        padding: 10px;
+        border-radius: 8px;
+        font-weight: 600;
+    }
+    #listaLibros button:hover { background-color: #fb923c; color: white; }
+    .tarjeta-estilo {
+    background: #ffffff;
+    border: 2px solid #bae6fd;
+    padding: 1.5rem; /* Un poco menos de padding para que los botones quepan bien */
+    border-radius: 1.5rem;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+</style>
+</head>
+
+<body class="bg-blue-50 font-sans">
+
+<div id="pantallaBienvenida" class="min-h-screen flex items-center justify-center p-4">
+    <div class="text-center max-w-lg bg-olive-glass shadow-2xl">
+        <h1 class="text-5xl font-extrabold mb-4 text-white">Tesoro Bíblico</h1>
+        <p id="fraseMotivacion" class="italic text-yellow-100 font-serif-elegant text-lg opacity-90 mb-8">
+            "La lámpara de mi vida es tu palabra."
+        </p>
+        <button onclick="iniciarApp()" class="bg-amber-500 hover:bg-amber-600 text-black font-bold py-4 px-10 rounded-full transition-all shadow-lg hover:scale-105">
+            Comenzar mi estudio
+        </button>
+    </div>
+</div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD -->
+    <div id="pantallaDashboard" class="hidden min-h-screen p-6 md:p-12">
+        <h2 class="text-3xl font-bold text-blue-900 mb-8 border-l-4 border-amber-500 pl-4">Mis Tarjetas de Estudio</h2>
+        <div class="flex gap-4 mb-10">
+            <input id="inputNombreTarjeta" class="flex-1 p-3 border rounded-lg" placeholder="Nombre de nueva tarjeta...">
+            <button onclick="crearTarjeta()" class="bg-blue-900 text-white px-6 py-2 rounded-lg font-bold">Crear Tarjeta</button>
+        </div>
+        <div id="listaTarjetas" class="grid grid-cols-1 md:grid-cols-3 gap-6"></div>
+    </div>
+
+    <!-- PANTALLA DE ESTUDIO -->
+    <div id="pantallaEstudio" class="hidden min-h-screen p-6 md:p-12">
+        <button onclick="volverAlInicio()" class="mb-6 text-blue-900 font-bold hover:underline">← Volver al Dashboard</button>
+        <h2 id="tituloTarjeta" class="text-4xl font-black text-blue-900 mb-8"></h2>
+        
+        <!-- Menú de pestañas -->
+        <div class="flex gap-2 mb-6 overflow-x-auto" id="menuTabs"></div>
+
+        <!-- 1. CONTENEDOR DE HERRAMIENTAS (Solo en Versículos) -->
+        <div id="contenedorVersiculos" class="hidden mb-8">
+    <div class="card-blessing p-6 rounded-3xl shadow-lg border border-blue-100">
+        <h4 class="text-blue-900 font-bold mb-3 text-center">📖 Acceso Rápido a la Biblia</h4>
+        <button onclick="abrirSelectorBiblia()" class="w-full bg-blue-900 text-white font-bold py-4 rounded-2xl hover:bg-blue-800 transition shadow-lg">
+            Seleccionar Versículo para Guardar
+        </button>
+    </div>
+</div>
+
+        <!-- 2. CONTENEDOR DE EDICIÓN (Siempre visible) -->
+        <div class="bg-white p-8 rounded-3xl shadow-xl border border-gray-100">
+    <textarea id="textoEntrada" class="w-full h-32 p-4 bg-gray-50 rounded-2xl outline-none border border-gray-200" placeholder="Escribe el versículo o tu reflexión aquí..."></textarea>
+    
+    <button onclick="guardarDato()" class="btn-naranja w-full py-4 rounded-2xl">
+    Guardar en mi Tesoro
+</button>
+
+<div id="modalBiblia" class="hidden fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4">
+    <div class="bg-panel-oscurito p-8 rounded-3xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+        <h3 id="tituloModal" class="text-2xl font-bold mb-6 text-white text-center">Selecciona un libro</h3>
+        <div id="listaLibros" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
+        <button onclick="cerrarSelector()" class="mt-6 w-full bg-slate-700 py-3 rounded-xl text-white font-bold hover:bg-slate-600">
+            Cancelar
+        </button>
+    </div>
+</div>
+
+<ul id="listaContenido" class="mt-8 space-y-4"></ul>
+
+    <!-- MODAL BIBLIA -->
+    <div id="modalBiblia" class="hidden fixed inset-0 bg-black bg-opacity-60 z-50 flex items-center justify-center p-4">
+        <div class="bg-white p-6 rounded-2xl max-w-2xl w-full max-h-[80vh] overflow-y-auto">
+            <h3 id="tituloModal" class="text-2xl font-bold mb-6 text-blue-900 text-center">Selecciona un libro</h3>
+            <div id="listaLibros" class="grid grid-cols-2 md:grid-cols-4 gap-3"></div>
+            <button onclick="cerrarSelector()" class="mt-6 w-full bg-slate-200 py-3 rounded-lg font-bold hover:bg-slate-300">Cancelar</button>
+        </div>
+    </div>
+
+    <script>
+        const secciones = ['Versículos', 'Títulos', 'Canciones', 'Preguntas', 'Info. Importante'];
+        // Al inicio de tu script:
+        let estado = { tarjetas: [], tarjetaActual: null, seccionActual: 'Versículos' };
+        cargarDatos(); // <--- LLAMA ESTO AQUÍ
+        let seleccionTemporal = { libro: '', capitulo: '' };
+        // Lista completa de libros
+const bibliaData = {
+    "Génesis": 50, "Éxodo": 40, "Levítico": 27, "Números": 36, "Deuteronomio": 34, "Josué": 24, "Jueces": 21,
+    "Rut": 4, "1 Samuel": 31, "2 Samuel": 24, "1 Reyes": 22, "2 Reyes": 25, "1 Crónicas": 29, "2 Crónicas": 36,
+    "Esdras": 10, "Nehemías": 13, "Ester": 10, "Job": 42, "Salmos": 150, "Proverbios": 31, "Eclesiastés": 12,
+    "Cantares": 8, "Isaías": 66, "Jeremías": 52, "Lamentaciones": 5, "Ezequiel": 48, "Daniel": 12, "Oseas": 14,
+    "Joel": 3, "Amós": 9, "Abdías": 1, "Jonás": 4, "Miqueas": 7, "Nahúm": 3, "Habacuc": 3, "Sofonías": 3,
+    "Hageo": 2, "Zacarías": 14, "Malaquías": 4, "Mateo": 28, "Marcos": 16, "Lucas": 24, "Juan": 21, "Hechos": 28,
+    "Romanos": 16, "1 Corintios": 16, "2 Corintios": 13, "Gálatas": 6, "Efesios": 6, "Filipenses": 4, "Colosenses": 4,
+    "1 Tesalonicenses": 5, "2 Tesalonicenses": 3, "1 Timoteo": 6, "2 Timoteo": 4, "Tito": 3, "Filemón": 1,
+    "Hebreos": 13, "Santiago": 5, "1 Pedro": 5, "2 Pedro": 3, "1 Juan": 5, "2 Juan": 1, "3 Juan": 1, "Judas": 1, "Apocalipsis": 22
+};
+const frases = [
+        "Tu palabra es una lámpara a mis pies.",
+        "El estudio de hoy es una semilla para mañana.",
+        "Busca primero el Reino y todo lo demás vendrá.",
+        "Tu reflexión es una oración escrita."
+    ];
+    document.getElementById('fraseMotivacion').innerText = `"${frases[Math.floor(Math.random() * frases.length)]}"`;
+
+// Función para mostrar el botón solo en "Versículos"
+function renderizarMenu() {
+    const menu = document.getElementById('menuTabs');
+    const contenedorVersiculos = document.getElementById('contenedorVersiculos');
+    
+    // Renderizado de botones (igual que tenías)
+    menu.innerHTML = secciones.map(s => `
+        <button onclick="cambiarSeccion('${s}')" class="p-2 text-sm font-bold rounded-lg ${estado.seccionActual === s ? 'bg-blue-900 text-white' : 'bg-gray-200'}">${s}</button>
+    `).join('');
+
+    // Lógica para mostrar/ocultar buscador y selector
+    if (estado.seccionActual === 'Versículos') {
+        contenedorVersiculos.classList.remove('hidden');
+    } else {
+        contenedorVersiculos.classList.add('hidden');
+    }
+}
+function abrirSelectorBiblia() {
+            document.getElementById('modalBiblia').classList.remove('hidden');
+            mostrarListaLibros();
+        }
+
+        // 1. Al seleccionar el capítulo, pedimos el versículo mediante un campo de texto
+function seleccionarCapitulo(cap) {
+    seleccionTemporal.capitulo = cap;
+    
+    // Cerramos el selector y abrimos un prompt para que el usuario escriba el versículo
+    cerrarSelector();
+    
+    const ver = prompt(`Has seleccionado ${seleccionTemporal.libro} ${cap}. ¿Qué versículo quieres añadir? (Ej: 1, o 1-5)`);
+    
+    if (ver) {
+        // Formamos la referencia completa
+        const referencia = `${seleccionTemporal.libro} ${cap}:${ver}`;
+        
+        // La ponemos en el cuadro de texto para que el usuario la vea
+        document.getElementById('textoEntrada').value = referencia;
+        
+        // ¡Opcional! Si quieres que se guarde automáticamente al escribirlo:
+        // guardarDato(); 
+    }
+}
+
+// 2. Función para mostrar los libros (sin cambiar nada más)
+function mostrarListaLibros() {
+    document.getElementById('tituloModal').innerText = "Selecciona un libro";
+    const lista = document.getElementById('listaLibros');
+    lista.innerHTML = Object.keys(bibliaData).map(l => 
+        `<button onclick="seleccionarLibro('${l}')" class="p-2 bg-blue-50 rounded hover:bg-blue-600 hover:text-white">${l}</button>`
+    ).join('');
+}
+
+// 3. Función para mostrar capítulos
+function seleccionarLibro(libro) {
+    seleccionTemporal.libro = libro;
+    document.getElementById('tituloModal').innerText = `${libro}: Elige el capítulo`;
+    const lista = document.getElementById('listaLibros');
+    lista.innerHTML = `<button onclick="mostrarListaLibros()" class="col-span-full text-red-600 font-bold">← Volver a libros</button>`;
+    
+    for(let i = 1; i <= bibliaData[libro]; i++) {
+        lista.innerHTML += `<button onclick="seleccionarCapitulo(${i})" class="p-2 bg-green-50 rounded hover:bg-green-600 hover:text-white">${i}</button>`;
+    }
+}
+async function finalizarSeleccion(ver) {
+    const referenciaCompleta = `${seleccionTemporal.libro} ${seleccionTemporal.capitulo}:${ver}`;
+    
+    // Mapeo simple por si la API falla con nombres en español
+    const traduccionLibros = {
+        "Génesis": "Genesis", "Éxodo": "Exodus", "Salmos": "Psalms", "Mateo": "Matthew", "Juan": "John"
+        // ... Si ves que otros libros fallan, solo agrégalos aquí siguiendo este patrón
+    };
+
+    let nombreParaApi = traduccionLibros[seleccionTemporal.libro] || seleccionTemporal.libro;
+    const url = `https://bible-api.com/${nombreParaApi}+${seleccionTemporal.capitulo}:${ver}?translation=rv1960`;
+
+    try {
+        const res = await fetch(url);
+        const data = await res.json();
+        
+        if(data.text) {
+            document.getElementById('textoEntrada').value = `${data.reference}: ${data.text}`;
+            guardarDato(); 
+            cerrarSelector();
+        } else {
+            alert("El versículo no se encontró en la base de datos.");
+        }
+    } catch(e) {
+        console.error(e);
+        alert("Error de conexión. Asegúrate de tener internet.");
+    }
+}
+
+function ingresarVersiculoManual() {
+    const ver = prompt("Escribe el número de versículo:");
+    if(ver) finalizarSeleccion(ver);
+}
+
+        function cerrarSelector() { document.getElementById('modalBiblia').classList.add('hidden'); }
+        function iniciarApp() {
+            document.getElementById('pantallaBienvenida').classList.add('hidden');
+            document.getElementById('pantallaDashboard').classList.remove('hidden');
+            renderizarTarjetas();
+        }
+
+        function crearTarjeta() {
+            const nombre = document.getElementById('inputNombreTarjeta').value;
+            if(nombre) {
+                const nueva = { nombre, Versículos: [], Títulos: [], Canciones: [], Preguntas: [], "Info. Importante": [] };
+                estado.tarjetas.push(nueva);
+                localStorage.setItem('estudioBiblico', JSON.stringify(estado));
+                renderizarTarjetas();
+            }
+        }
+
+        function abrirTarjeta(index) {
+            estado.tarjetaActual = index;
+            document.getElementById('pantallaDashboard').classList.add('hidden');
+            document.getElementById('pantallaEstudio').classList.remove('hidden');
+            document.getElementById('tituloTarjeta').innerText = estado.tarjetas[index].nombre;
+            renderizarMenu();
+            renderizarLista();
+        }
+
+               // En tu función renderizarTarjetas, cambia la parte que muestra la tarjeta:
+// 1. Cargar datos al iniciar
+function cargarDatos() {
+    const datosGuardados = localStorage.getItem('estudioBiblico');
+    if (datosGuardados) {
+        estado = JSON.parse(datosGuardados);
+    }
+}
+
+// 2. Modificación en renderizarTarjetas (Para que las letras resalten)
+function renderizarTarjetas() {
+    const lista = document.getElementById('listaTarjetas');
+    lista.innerHTML = estado.tarjetas.map((t, index) => `
+        <div class="tarjeta-estilo">
+            <h3 class="text-2xl font-bold text-white-800 mb-4">${t.nombre}</h3>
+            
+            <button onclick="abrirTarjeta(${index})" class="w-full bg-amber-500 text-black font-bold py-3 rounded-xl hover:bg-amber-400 transition mb-3">
+                Abrir Estudio
+            </button>
+            
+            <button onclick="eliminarTarjeta(${index})" class="w-full text-orange-500 hover:text-orange-700 text-sm font-semibold transition-all">
+                Eliminar esta tarjeta
+            </button>
+        </div>
+    `).join('');
+}
+function eliminarTarjeta(index) {
+    if (confirm("¿Estás seguro de que quieres eliminar esta tarjeta?")) {
+        // Borrar del array
+        estado.tarjetas.splice(index, 1);
+        
+        // Guardar cambios
+        localStorage.setItem('estudioBiblico', JSON.stringify(estado));
+        
+        // Recargar la vista
+        renderizarTarjetas();
+    }
+}
+
+function eliminarVersiculo(index) {
+    // 1. Eliminar del array actual
+    estado.tarjetas[estado.tarjetaActual][estado.seccionActual].splice(index, 1);
+    
+    // 2. Guardar el nuevo estado en localStorage
+    localStorage.setItem('estudioBiblico', JSON.stringify(estado));
+    
+    // 3. Refrescar la lista para que desaparezca visualmente
+    renderizarLista();
+}
+// 3. Asegurar guardado en cada cambio
+function guardarDato() {
+    const texto = document.getElementById('textoEntrada').value;
+    if (!texto.trim()) return;
+
+    estado.tarjetas[estado.tarjetaActual][estado.seccionActual].push(texto);
+    
+    // GUARDADO FORZADO
+    localStorage.setItem('estudioBiblico', JSON.stringify(estado));
+    
+    document.getElementById('textoEntrada').value = "";
+    renderizarLista();
+}
+
+        function cambiarSeccion(s) { 
+    estado.seccionActual = s; 
+    renderizarMenu();  // Esto oculta/muestra el buscador
+    renderizarLista(); // Esto actualiza el texto con lo de la sección nueva
+}
+
+// 2. Renderizado forzado para ver siempre lo que guardas
+function renderizarLista() {
+    const contenedor = document.getElementById('listaContenido');
+    const datos = estado.tarjetas[estado.tarjetaActual][estado.seccionActual];
+    
+    contenedor.innerHTML = datos.map((texto, index) => `
+        <li class="p-4 bg-white shadow-sm border border-blue-100 rounded-lg flex justify-between items-center group">
+            <span class="text-gray-800">${texto}</span>
+            
+            <button onclick="eliminarVersiculo(${index})" class="text-red-400 hover:text-red-600 font-bold ml-4">
+                ✕
+            </button>
+        </li>
+    `).join('');
+}
+// 3. Simplificación: Escribir versículo manualmente
+function usarBuscadorManual() {
+    const ref = document.getElementById('refBiblica').value;
+    if (ref) {
+        document.getElementById('textoEntrada').value = ref;
+        document.getElementById('refBiblica').value = ""; // Limpiar buscador
+    }
+}
+
+        function volverAlInicio() {
+            document.getElementById('pantallaEstudio').classList.add('hidden');
+            document.getElementById('pantallaDashboard').classList.remove('hidden');
+        }
+        
+async function obtenerVersiculo() {
+    // Obtenemos la referencia desde el input (o desde la variable si usas el selector)
+    const ref = document.getElementById('refBiblica').value;
+    
+    if(!ref) return;
+
+    // URL simplificada (sin espacios)
+    const url = `https://bible-api.com/${ref.replace(/\s+/g, '')}?translation=rv1960`;
+
+    try {
+        const res = await fetch(url);
+        
+        if (!res.ok) throw new Error("No se pudo conectar");
+        
+        const data = await res.json();
+        
+        if (data.text) {
+            document.getElementById('textoEntrada').value = `${data.reference}: ${data.text}`;
+            guardarDato(); // ¡Guardado automático!
+            cerrarSelector();
+        } else {
+            alert("Versículo no encontrado, revisa el formato.");
+        }
+    } catch (error) {
+        // Esto captura el error real
+        console.error("Error detallado:", error);
+        alert("No hay conexión con el servidor bíblico. Verifica tu internet.");
+    }
+}
+    </script>
+</body>
+</html>
