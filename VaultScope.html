@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NoteRadar | Bóveda Inteligente</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+    /* Estructura básica de vistas */
+    .view { display: none; }
+    .active { display: block; }
+
+    body { 
+        font-family: 'Georgia', serif;
+        background-color: #ede9e6; /* Fondo tipo papel viejo */
+        color: #181604;
+        line-height: 1.6;
+        padding: 20px;
+        min-height: 100vh;
+    }
+
+    /* Recuadro de Login Compacto y elegante */
+    .neon-card {
+        padding: 40px;
+        background: #ffffff;
+        border: 2px solid #4a3728; /* Borde elegante café */
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        border-radius: 12px;
+        width: 100%;
+        max-width: 450px;
+        margin: 50px auto; /* Centrado automático */
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    /* Paneles de contenido */
+    .lit-panel { 
+        background-color: #ffffff; 
+        border: 1px solid #dcd3c9; 
+        box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        padding: 25px;
+        border-radius: 4px;
+        max-width: 800px;
+        margin: auto;
+    }
+
+    /* Botones */
+    .lit-btn { 
+        background-color: #4a3728; 
+        color: #f4ede4;
+        border: none;
+        padding: 10px 20px; 
+        cursor: pointer;
+        font-family: 'Georgia', serif;
+        transition: background 0.3s;
+        border-radius: 4px;
+    }
+    .lit-btn:hover { background-color: #2c2420; }
+
+    /* Inputs estilo libreta */
+    input, textarea { 
+        border: none; 
+        border-bottom: 2px solid #a69e96;
+        background-color: #f0ece9;
+        padding: 12px;
+        width: 100%;
+        font-family: 'Georgia', serif;
+        font-size: 16px;
+        color: #2c2420;
+        transition: all 0.3s;
+    }
+
+    input:focus, textarea:focus { 
+        background-color: #e8e4e0;
+        border-bottom-color: #4a3728;
+        outline: none;
+    }
+
+    /* Headers de Carpetas */
+    .folder-header { 
+        border-bottom: 2px solid #4a3728; 
+        color: #4a3728; 
+        font-weight: bold; 
+        margin-bottom: 10px;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        font-size: 0.9rem;
+    }
+</style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- 1. LOGIN (Ventana única) -->
+    <div id="login-view" class="view active retro-panel max-w-sm mx-auto">
+        <h1 class="text-2xl font-black mb-6 text-center">NoteRadar Login</h1>
+        <input id="user-in" placeholder="Usuario" class="w-full p-3 border rounded-xl mb-3">
+        <input id="pass-in" type="password" placeholder="Clave" class="w-full p-3 border rounded-xl mb-6">
+        <button onclick="login()" class="w-full bg-slate-800 text-white py-3 rounded-xl font-bold">Acceder</button>
+    </div>
+
+    <!-- 2. DASHBOARD (El Menú) -->
+    <div id="dashboard-view" class="view max-w-5xl mx-auto">
+    <div class="flex justify-between items-center mb-8">
+        <h1 class="text-3xl font-black" id="welcome-user"></h1>
+        <button onclick="irLogin()" class="text-red-500 font-bold">Salir</button>
+    </div>
+
+    <div class="flex gap-4 mb-8 items-end">
+    <div class="flex-1">
+        <label class="text-xs uppercase tracking-widest text-stone-500">Catálogo</label>
+        <input type="text" id="search-bar" onkeyup="filtrarNotas()" 
+               placeholder="Buscar en mis libros..." 
+               class="w-full p-2 border-b-2 border-stone-300 bg-transparent outline-none">
+    </div>
+    <button onclick="exportarManuscrito()" 
+            class="px-4 py-2 bg-stone-800 text-white text-sm rounded hover:bg-stone-600 transition">
+        Exportar Manuscrito
+    </button>
+</div>
+
+    <div class="bg-white p-6 rounded-2xl mb-8 shadow-sm border border-stone-100">
+        <h2 class="font-bold mb-4 text-stone-700">Añadir Nuevo Libro</h2>
+        <div class="flex gap-4 items-center">
+            <input id="new-book" placeholder="Título del libro" class="flex-1 p-3 border border-stone-200 rounded-xl outline-none focus:border-stone-400">
+            <input id="new-pages" type="number" placeholder="Total págs" class="w-32 p-3 border border-stone-200 rounded-xl outline-none focus:border-stone-400">
+            <button onclick="crearLibro()" class="bg-[#4a3728] text-white px-6 py-3 rounded-xl font-bold hover:bg-[#2c2420] transition-colors">
+                Crear
+            </button>
+        </div>
+    </div>
+
+    <div id="grid-libros" class="grid md:grid-cols-3 gap-6"></div>
+</div>
+
+    <!-- 3. WORKSPACE (Ventana de Notas) -->
+   <!-- WORKSPACE (Ventana de Notas con Carpetas por Color) -->
+<div id="workspace-view" class="view max-w-4xl mx-auto">
+    <button onclick="irDashboard()" class="mb-6 text-slate-400 font-bold hover:text-slate-600 transition">← Volver al Menú</button>
+    
+    <div class="bg-white p-8 rounded-3xl shadow-sm mb-8 border border-slate-100">
+        <h1 id="b-title" class="text-4xl font-black mb-4 text-slate-800"></h1>
+        <div class="w-full bg-slate-100 rounded-full h-3 mb-2 overflow-hidden">
+            <div id="bar" class="bg-slate-800 h-3 rounded-full w-0 transition-all"></div>
+        </div>
+        <input type="number" id="p-curr" oninput="updateProg()" placeholder="¿En qué página vas?" class="w-full p-3 border-none bg-slate-50 rounded-xl focus:ring-2 ring-slate-200 outline-none">
+    </div>
+
+    <!-- Panel de Edición -->
+    <div class="bg-white p-8 rounded-3xl shadow-sm mb-10 border border-slate-100">
+        <input id="n-title" placeholder="Título de la nota..." class="w-full p-4 mb-4 border-b-2 border-slate-100 outline-none font-bold text-lg">
+        <textarea id="n-text" placeholder="Escribe aquí tu contenido..." class="w-full p-4 mb-6 border border-slate-100 rounded-2xl h-24 outline-none"></textarea>
+            
+    <div class="flex gap-2 mt-4">
+    <button id="btn-titulo" onclick="setMode('titulo')" class="flex-1 p-3 rounded-xl bg-red-50 text-red-500 font-bold border-2 border-red-200 text-xs md:text-sm">🔴 Título</button>
+    <button id="btn-sub" onclick="setMode('sub')" class="flex-1 p-3 rounded-xl bg-blue-50 text-blue-500 font-bold border-2 border-blue-200 text-xs md:text-sm">🔵 Sub</button>
+    <button id="btn-clave" onclick="setMode('clave')" class="flex-1 p-3 rounded-xl bg-amber-50 text-amber-500 font-bold border-2 border-amber-200 text-xs md:text-sm">🟡 Clave</button>
+    <button id="btn-cont" onclick="setMode('cont')" class="flex-1 p-3 rounded-xl bg-emerald-50 text-emerald-500 font-bold border-2 border-emerald-200 text-xs md:text-sm">🟢 Cont.</button>
+</div>
+    
+    <button onclick="guardarInfo()" class="mt-4 w-full bg-blue-900 text-white font-bold py-2 border border-black">GUARDAR EN BÓVEDA</button>
+</div>
+<script>
+    let selectedColor = 'border-slate-300';
+    let selectedBg = 'bg-slate-300';
+    let targetFolder = 'folder-cont';
+
+    function selectColor(border, bg, folderId) {
+        selectedColor = border;
+        selectedBg = bg;
+        targetFolder = folderId;
+        alert("Categoría seleccionada: " + folderId.split('-')[1].toUpperCase());
+    }
+    // Variables de estado
+let currentMode = 'titulo'; // Empezamos en modo Título
+function filtrarNotas() {
+    let input = document.getElementById('search-bar').value.toLowerCase();
+    let notas = document.querySelectorAll('.note-card');
+    notas.forEach(nota => {
+        let texto = nota.innerText.toLowerCase();
+        nota.style.display = texto.includes(input) ? "block" : "none";
+    });
+}
+
+function setMode(m) {
+    currentMode = m;
+    const titleInput = document.getElementById('n-title');
+    const textInput = document.getElementById('n-text');
+    
+    // 1. Lógica de visibilidad
+    if (m === 'titulo' || m === 'sub') {
+        titleInput.style.display = 'block';
+        textInput.style.display = 'none';
+    } else {
+        titleInput.style.display = 'none';
+        textInput.style.display = 'block';
+    }
+}
+
+function guardarInfo() {
+    const t = document.getElementById('n-title').value;
+    const txt = document.getElementById('n-text').value;
+    const p = document.getElementById('p-curr').value;
+    
+    if ((currentMode === 'titulo' || currentMode === 'sub') && !t) return alert("Escribe un título");
+    if ((currentMode === 'clave' || currentMode === 'cont') && !txt) return alert("Escribe el contenido");
+    
+    // 1. Crear el elemento div
+const card = document.createElement('div');
+card.className = "note-card bg-white border border-stone-300 p-3 mb-3 shadow-sm";
+
+// 2. Obtener fecha actual
+const fecha = new Date().toLocaleDateString();
+
+// 3. Definir el contenido unificado
+card.innerHTML = `
+    <div class="flex justify-between items-start">
+        <div style="flex: 1;">
+            <small style="color: #a69e96; display: block; margin-bottom: 5px;">${fecha}</small>
+            
+            <div style="color: #4a3728;">
+                ${(currentMode === 'titulo' || currentMode === 'sub') ? 
+                    `<strong style="font-size: 1.1em;">${t}</strong>` : 
+                    `<p style="margin: 0;">${txt}</p>`}
+            </div>
+            
+            <div style="margin-top: 8px; font-size: 0.85em; color: #8c8279;">
+                Pág: ${p}
+            </div>
+        </div>
+        
+        <button onclick="this.parentElement.parentElement.remove()" 
+                style="background: #f4ede4; border: 1px solid #dcd3c9; cursor: pointer; padding: 2px 8px; font-weight: bold; color: #4a3728;">
+            X
+        </button>
+    </div>
+`;
+
+// 4. Agregar al contenedor destino
+const container = document.querySelector(`#folder-${currentMode} > div`);
+container.appendChild(card);
+    
+    container.appendChild(card);
+
+    // Limpiar campos de nota al guardar
+    document.getElementById('n-title').value = "";
+    document.getElementById('n-text').value = "";
+}
+        let userData = { books: [] };
+        let currentBook = null;
+
+    function exportarManuscrito() {
+    let contenido = "--- MI BIBLIOTECA PERSONAL ---\n\n";
+    
+    // Seleccionamos todas las notas existentes
+    const notas = document.querySelectorAll('.note-card');
+    
+    if (notas.length === 0) {
+        alert("Tu biblioteca está vacía, ¡escribe algo primero!");
+        return;
+    }
+
+    notas.forEach((n, index) => {
+        // Obtenemos solo el texto limpio, quitando el botón "X"
+        let textoLimpio = n.innerText.replace("X", "").trim();
+        contenido += `NOTA #${index + 1}\n${textoLimpio}\n---------------------------\n\n`;
+    });
+
+    const blob = new Blob([contenido], { type: 'text/plain' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = "MiManuscrito.txt";
+    a.click();
+}
+        function showView(id) {
+            document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        function login() {
+            const user = document.getElementById('user-in').value;
+            if(!user) return;
+            document.getElementById('welcome-user').innerText = "Bienvenido, " + user;
+            showView('dashboard-view');
+        }
+
+        function irLogin() { location.reload(); }
+
+        function crearLibro() {
+            const title = document.getElementById('new-book').value;
+            const pages = document.getElementById('new-pages').value;
+            userData.books.push({ title, pages, notes: [] });
+            renderBooks();
+        }
+
+        function renderBooks() {
+            document.getElementById('grid-libros').innerHTML = userData.books.map((b, i) => `
+                <div class="bg-white p-6 rounded-2xl shadow border-l-4 border-slate-800">
+                    <h3 class="font-bold text-lg">${b.title}</h3>
+                    <p class="text-sm mb-4">${b.pages} págs</p>
+                    <button onclick="abrirLibro(${i})" class="w-full bg-slate-100 py-2 rounded-lg font-bold">Abrir</button>
+                </div>
+            `).join('');
+        }
+
+        function abrirLibro(i) {
+            currentBook = userData.books[i];
+            document.getElementById('b-title').innerText = currentBook.title;
+            showView('workspace-view');
+        }
+
+        function updateProg() {
+            const p = document.getElementById('p-curr').value;
+            const perc = Math.min((p / currentBook.pages) * 100, 100);
+            document.getElementById('bar').style.width = perc + "%";
+        }
+
+        function guardarNota(color) {
+            const t = document.getElementById('n-title').value;
+            const txt = document.getElementById('n-text').value;
+            const p = document.getElementById('p-curr').value;
+            document.getElementById('list-notes').innerHTML += `
+                <div class="bg-white p-4 rounded-xl border-l-8 ${color} shadow">
+                    <h4 class="font-bold">${t} <span class="text-xs text-slate-400">(Pág ${p})</span></h4>
+                    <p class="text-sm">${txt}</p>
+                    <button onclick="this.parentElement.remove()" class="text-red-500 text-xs font-bold mt-2">BORRAR</button>
+                </div>`;
+        }
+        function irDashboard() {
+    // 1. Cambiar vista
+    showView('dashboard-view');
+    
+    // 2. Limpiar campos del Dashboard (Agregar Libro)
+    document.getElementById('new-book').value = "";
+    document.getElementById('new-pages').value = "";
+}
+    </script>
+</body>
+</html>
