@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ColorStudio Pro | Suite de Diseño Avanzada</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Variables de Tema (Dark / Light) */
+        [data-theme="dark"] {
+            --bg-color: #0b0f19;
+            --card-bg: #131b2e;
+            --card-inner: rgba(19, 27, 46, 0.6);
+            --text-color: #f1f5f9;
+            --text-muted: #94a3b8;
+            --primary: #6366f1;
+            --primary-hover: #4f46e5;
+            --border-color: #1e293b;
+            --shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.5);
+            --modal-bg: rgba(11, 15, 25, 0.85);
+        }
+
+        [data-theme="light"] {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --card-inner: #f1f5f9;
+            --text-color: #0f172a;
+            --text-muted: #64748b;
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --border-color: #e2e8f0;
+            --shadow: 0 15px 35px -5px rgba(0, 0, 0, 0.08);
+            --modal-bg: rgba(255, 255, 255, 0.85);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 2rem 1rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1200px;
+        }
+
+        /* Barra Superior Profesional */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: var(--card-bg);
+            padding: 1rem 1.5rem;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            transition: background 0.3s ease, border 0.3s ease;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-avatar {
+            width: 42px;
+            height: 42px;
+            background: var(--primary);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .top-controls {
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+        }
+
+        .btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1.3rem;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 500;
+            font-family: 'Poppins', sans-serif;
+            transition: background 0.2s, transform 0.1s;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn:active {
+            transform: scale(0.97);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--text-color);
+            background: transparent;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        h1 {
+            margin-bottom: 0.5rem;
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(to right, #818cf8, #c084fc, #f472b6);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p.subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* Menú de Pestañas */
+        .categories-nav {
+            display: flex;
+            justify-content: center;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            margin-bottom: 2.5rem;
+        }
+
+        .cat-btn {
+            background-color: var(--card-bg);
+            color: var(--text-muted);
+            border: 1px solid var(--border-color);
+            padding: 0.6rem 1.4rem;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow);
+        }
+
+        .cat-btn:hover {
+            border-color: var(--primary);
+            color: var(--text-color);
+        }
+
+        .cat-btn.active {
+            background-color: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+            box-shadow: 0 4px 15px rgba(99, 102, 241, 0.4);
+        }
+
+        /* Secciones de Vistas */
+        .section-view {
+            display: none;
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border-color);
+            animation: fadeIn 0.4s ease;
+            transition: background 0.3s ease, border 0.3s ease;
+        }
+
+        .section-view.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .section-desc {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 1.8rem;
+        }
+
+        /* Cuadrículas de Colores */
+        .color-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+            gap: 1.2rem;
+        }
+
+        .color-item {
+            background: var(--card-inner);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+        }
+
+        .color-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+        }
+
+        .color-preview {
+            height: 100px;
+            width: 100%;
+            cursor: pointer;
+        }
+
+        .color-details {
+            padding: 0.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+        }
+
+        .color-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .color-hex {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        .action-row {
+            display: flex;
+            gap: 4px;
+            margin-top: 4px;
+        }
+
+        .chip-btn {
+            flex: 1;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            color: var(--text-muted);
+            padding: 5px 2px;
+            font-size: 0.68rem;
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.2s;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        .chip-btn:hover {
+            background: var(--primary);
+            color: #fff;
+            border-color: var(--primary);
+        }
+
+        /* Mezclador RGB */
+        .mixer-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2.5rem;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .mixer-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .mixer-preview {
+            height: 260px;
+            border-radius: 16px;
+            border: 2px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 1.5rem;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.15);
+        }
+
+        .mixer-controls {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+        }
+
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        .slider-group label {
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        /* Ventana Modal de Inicio de Sesión */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--modal-bg);
+            backdrop-filter: blur(8px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-card {
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            padding: 2.5rem;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 400px;
+            box-shadow: var(--shadow);
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: scale(1);
+        }
+
+        .modal-card h2 {
+            margin: 0;
+            font-size: 1.6rem;
+            font-weight: 600;
+        }
+
+        .modal-card input {
+            background: var(--card-inner);
+            border: 1px solid var(--border-color);
+            padding: 0.8rem 1rem;
+            border-radius: 10px;
+            color: var(--text-color);
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            outline: none;
+        }
+
+        .modal-card input:focus {
+            border-color: var(--primary);
+        }
+
+        /* Notificación Toast */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            background: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            box-shadow: var(--shadow);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- VENTANA MODAL DE INICIO DE SESIÓN -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="modal-card">
+            <h2>Acceso a ColorStudio ✨</h2>
+            <p style="color: var(--text-muted); font-size: 0.9rem; margin: 0;">Ingresa tu nombre para habilitar tu perfil privado y guardar tus colores personalizados.</p>
+            <input type="text" id="modalUsernameInput" placeholder="Ej. Alex Designer..." autocomplete="off">
+            <div style="display: flex; gap: 0.8rem; margin-top: 0.5rem;">
+                <button class="btn" id="modalSubmitBtn" style="flex: 2;">Entrar a la Suite</button>
+                <button class="btn btn-outline" id="modalCloseBtn" style="flex: 1;">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Barra Superior -->
+        <div class="top-bar">
+            <div class="user-info">
+                <div class="user-avatar" id="userAvatar">U</div>
+                <div>
+                    <strong id="userNameDisplay">Invitado</strong>
+                    <div style="font-size: 0.75rem; color: var(--text-muted);" id="userRoleStatus">Modo Exploración</div>
+                </div>
+            </div>
+            
+            <div class="top-controls">
+                <button class="btn btn-outline" id="themeToggleBtn" title="Cambiar Tema">🌙 Tema</button>
+                <button class="btn" id="openLoginModalBtn">Iniciar Sesión 🔐</button>
+            </div>
+        </div>
+
+        <header>
+            <h1>ColorStudio Pro 🎨💻</h1>
+            <p class="subtitle">Suite profesional de diseño front-end: bibliotecas temáticas extendidas, mezclador RGB y generación inteligente.</p>
+        </header>
+
+        <!-- Navegación de Vistas -->
+        <div class="categories-nav" id="categoriesNav">
+            <button class="cat-btn active" data-target="view-library">📚 Biblioteca Ampliada</button>
+            <button class="cat-btn" data-target="view-mixer">🧪 Mezclador RGB</button>
+            <button class="cat-btn" data-target="view-generator">🪄 Generador Armónico</button>
+            <button class="cat-btn" data-target="view-favorites">⭐ Mis Colores</button>
+        </div>
+
+        <!-- VISTA 1: BIBLIOTECA AMPLIADA (CON MÁS CATEGORÍAS Y TONOS) -->
+        <div class="section-view active" id="view-library">
+            <div style="margin-bottom: 1.5rem; display: flex; gap: 0.6rem; flex-wrap: wrap;" id="subFolderNav"></div>
+            <div id="libraryContent"></div>
+        </div>
+
+        <!-- VISTA 2: MEZCLADOR RGB -->
+        <div class="section-view" id="view-mixer">
+            <div class="section-title">Laboratorio de Colores RGB 🧪</div>
+            <div class="section-desc">Diseña nuevos tonos exactos manipulando los canales digitales de luz.</div>
+            
+            <div class="mixer-container">
+                <div class="mixer-preview" id="mixerPreviewBox">
+                    <span id="mixerHexText" style="font-weight: 700; font-size: 1.2rem; background: rgba(0,0,0,0.4); padding: 8px 12px; border-radius: 8px; width: fit-content;">#FFFFFF</span>
+                </div>
+                <div class="mixer-controls">
+                    <div class="slider-group">
+                        <label>Rojo (Red): <span id="rVal">99</span></label>
+                        <input type="range" id="rangeR" min="0" max="255" value="99">
+                    </div>
+                    <div class="slider-group">
+                        <label>Verde (Green): <span id="gVal">102</span></label>
+                        <input type="range" id="rangeG" min="0" max="255" value="102">
+                    </div>
+                    <div class="slider-group">
+                        <label>Azul (Blue): <span id="bVal">241</span></label>
+                        <input type="range" id="rangeB" min="0" max="255" value="241">
+                    </div>
+                    <div style="display: flex; gap: 0.5rem; margin-top: 1rem; flex-wrap: wrap;">
+                        <button class="btn" id="saveMixedColorBtn" style="flex: 2;">Guardar en Favoritos ⭐</button>
+                        <button class="btn btn-outline" id="copyMixedBtn" style="flex: 1;">Copiar HEX</button>
+                        <button class="btn btn-outline" id="exportCssMixedBtn" style="flex: 1;">Copiar CSS</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VISTA 3: GENERADOR DE PALETAS ARMÓNICAS -->
+        <div class="section-view" id="view-generator">
+            <div class="section-title">Generador de Paletas Armónicas 🪄✨</div>
+            <div class="section-desc">Haz clic en el botón para crear al instante una combinación profesional y equilibrada lista para tu próximo proyecto web.</div>
+            
+            <div style="display: flex; flex-direction: column; gap: 1.5rem; align-items: center;">
+                <button class="btn" id="generatePaletteBtn" style="padding: 0.8rem 2rem; font-size: 1rem;">Generar Nueva Paleta Aleatoria ⚡</button>
+                
+                <div class="color-grid" id="generatorGrid" style="width: 100%; margin-top: 1rem;"></div>
+            </div>
+        </div>
+
+        <!-- VISTA 4: FAVORITOS -->
+        <div class="section-view" id="view-favorites">
+            <div class="section-title">Tus Colores Guardados ⭐</div>
+            <div class="section-desc" id="favDesc">Inicia sesión para ver tu colección personal guardada en el sistema.</div>
+            <div class="color-grid" id="favoritesGrid"></div>
+        </div>
+    </div>
+
+    <!-- Alerta Toast -->
+    <div class="toast" id="toast">¡Acción realizada con éxito! ✨</div>
+
+    <script>
+        // Base de Datos Estructurada con Múltiples Categorías y Tonos Especiales
+        const colorDatabase = [
+            { 
+                id: "special", 
+                name: "🌈 Gradientes y Tonos Pro", 
+                colors: [
+                    { name: "Índigo Profundo", hex: "#312E81" },
+                    { name: "Violeta Vibrante", hex: "#7C3AED" },
+                    { name: "Fucsia Neón", hex: "#DB2777" },
+                    { name: "Turquesa Brillante", hex: "#06B6D4" },
+                    { name: "Esmeralda Limpio", hex: "#059669" },
+                    { name: "Ámbar Atardecer", hex: "#D97706" }
+                ] 
+            },
+            { 
+                id: "pastels", 
+                name: "🌸 Pasteles", 
+                colors: [
+                    { name: "Rosa Romántico", hex: "#FFD1DC" }, 
+                    { name: "Menta Fresco", hex: "#B4F8C8" }, 
+                    { name: "Lavanda Suave", hex: "#E2F0CB" }, 
+                    { name: "Melocotón Cálido", hex: "#FFDAC1" },
+                    { name: "Celeste Cielo", hex: "#C5D3E8" }
+                ] 
+            },
+            { 
+                id: "neon", 
+                name: "⚡ Neón", 
+                colors: [
+                    { name: "Verde Matrix", hex: "#00FF66" }, 
+                    { name: "Rosa Fucsia", hex: "#FF007F" }, 
+                    { name: "Azul Eléctrico", hex: "#00F0FF" }, 
+                    { name: "Amarillo Neón", hex: "#CCFF00" },
+                    { name: "Violeta Neón", hex: "#9D00FF" }
+                ] 
+            },
+            { 
+                id: "minimal", 
+                name: "☕ Neutros y Minimal", 
+                colors: [
+                    { name: "Beige Arena", hex: "#E3D5CA" }, 
+                    { name: "Café Espresso", hex: "#2C221E" }, 
+                    { name: "Gris Pizarra", hex: "#4A5568" }, 
+                    { name: "Blanco Hueso", hex: "#F7F5F0" },
+                    { name: "Negro Carbón", hex: "#121212" }
+                ] 
+            },
+            { 
+                id: "cyberpunk", 
+                name: "🌆 Cyberpunk", 
+                colors: [
+                    { name: "Neón Magenta", hex: "#FF0055" }, 
+                    { name: "Cian Profundo", hex: "#00E5FF" }, 
+                    { name: "Amarillo Ciber", hex: "#F4EE01" }, 
+                    { name: "Morado Oscuro", hex: "#240046" },
+                    { name: "Azul Medianoche", hex: "#0B132B" }
+                ] 
+            },
+            { 
+                id: "earth", 
+                name: "🌿 Tierra y Naturaleza", 
+                colors: [
+                    { name: "Verde Bosque", hex: "#2D6A4F" }, 
+                    { name: "Marrón Terracota", hex: "#BC6C25" }, 
+                    { name: "Beige Cálido", hex: "#D4A373" }, 
+                    { name: "Verde Salvia", hex: "#87A96B" },
+                    { name: "Ocre Dorado", hex: "#D4AF37" }
+                ] 
+            }
+        ];
+
+        // Estado Global
+        let currentUser = localStorage.getItem('colorStudioUser') || null;
+        let userFavorites = JSON.parse(localStorage.getItem('colorStudioFavs')) || [];
+        let currentTheme = localStorage.getItem('colorStudioTheme') || 'dark';
+
+        // Aplicar Tema Inicial
+        document.documentElement.setAttribute('data-theme', currentTheme);
+        document.getElementById('themeToggleBtn').textContent = currentTheme === 'dark' ? '☀️ Modo Claro' : '🌙 Modo Oscuro';
+
+        // Cambiar Tema
+        document.getElementById('themeToggleBtn').addEventListener('click', () => {
+            currentTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', currentTheme);
+            localStorage.setItem('colorStudioTheme', currentTheme);
+            document.getElementById('themeToggleBtn').textContent = currentTheme === 'dark' ? '☀️ Modo Claro' : '🌙 Modo Oscuro';
+        });
+
+        // Manejo de la Ventana Modal de Login
+        const loginModal = document.getElementById('loginModal');
+        document.getElementById('openLoginModalBtn').addEventListener('click', () => loginModal.classList.add('active'));
+        document.getElementById('modalCloseBtn').addEventListener('click', () => loginModal.classList.remove('active'));
+
+        document.getElementById('modalSubmitBtn').addEventListener('click', () => {
+            const val = document.getElementById('modalUsernameInput').value.trim();
+            if(val) {
+                currentUser = val;
+                localStorage.setItem('colorStudioUser', currentUser);
+                loginModal.classList.remove('active');
+                updateAuthUI();
+                showToast(`¡Bienvenido al sistema, ${currentUser}! ✨`);
+            } else {
+                showToast("Por favor escribe un nombre válido.");
+            }
+        });
+
+        function logout() {
+            currentUser = null;
+            localStorage.removeItem('colorStudioUser');
+            updateAuthUI();
+            showToast("Sesión cerrada correctamente.");
+        }
+
+        function updateAuthUI() {
+            const authBtnContainer = document.getElementById('openLoginModalBtn');
+            if (currentUser) {
+                document.getElementById('userNameDisplay').textContent = currentUser;
+                document.getElementById('userAvatar').textContent = currentUser.charAt(0).toUpperCase();
+                document.getElementById('userRoleStatus').textContent = "Diseñador Activo";
+                authBtnContainer.textContent = "Cerrar Sesión 🚪";
+                authBtnContainer.onclick = logout;
+            } else {
+                document.getElementById('userNameDisplay').textContent = "Invitado";
+                document.getElementById('userAvatar').textContent = "U";
+                document.getElementById('userRoleStatus').textContent = "Modo Exploración";
+                authBtnContainer.textContent = "Iniciar Sesión 🔐";
+                authBtnContainer.onclick = () => loginModal.classList.add('active');
+            }
+            renderFavorites();
+        }
+
+        // Pestañas Principales
+        const categoriesNav = document.getElementById('categoriesNav');
+        categoriesNav.addEventListener('click', (e) => {
+            if(e.target.classList.contains('cat-btn')) {
+                categoriesNav.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                const targetId = e.target.dataset.target;
+                document.querySelectorAll('.section-view').forEach(s => s.classList.remove('active'));
+                document.getElementById(targetId).classList.add('active');
+            }
+        });
+
+        // Renderizar Biblioteca con las Nuevas Subcarpetas
+        const libraryContent = document.getElementById('libraryContent');
+        const subFolderNav = document.getElementById('subFolderNav');
+
+        function initLibrary() {
+            subFolderNav.innerHTML = '';
+            libraryContent.innerHTML = '';
+
+            colorDatabase.forEach((cat, index) => {
+                const subBtn = document.createElement('button');
+                subBtn.classList.add('cat-btn');
+                if(index === 0) subBtn.classList.add('active');
+                subBtn.textContent = cat.name;
+                subBtn.dataset.catid = cat.id;
+                subFolderNav.appendChild(subBtn);
+
+                const folderDiv = document.createElement('div');
+                folderDiv.classList.add('library-folder');
+                folderDiv.id = `folder-${cat.id}`;
+                folderDiv.style.display = index === 0 ? 'block' : 'none';
+
+                let gridHtml = '<div class="color-grid">';
+                cat.colors.forEach(c => {
+                    gridHtml += `
+                        <div class="color-item">
+                            <div class="color-preview" style="background-color: ${c.hex};" onclick="copyToClipboard('${c.hex}')" title="Copiar HEX"></div>
+                            <div class="color-details">
+                                <span class="color-name">${c.name}</span>
+                                <span class="color-hex">${c.hex}</span>
+                                <div class="action-row">
+                                    <button class="chip-btn" onclick="copyToClipboard('${c.hex}')">Copiar</button>
+                                    <button class="chip-btn" onclick="exportCss('${c.hex}')">CSS</button>
+                                    <button class="chip-btn" onclick="saveToFavs('${c.name}', '${c.hex}')">⭐</button>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                gridHtml += '</div>';
+                folderDiv.innerHTML = gridHtml;
+                libraryContent.appendChild(folderDiv);
+            });
+        }
+
+        subFolderNav.addEventListener('click', (e) => {
+            if(e.target.classList.contains('cat-btn')) {
+                subFolderNav.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                
+                const catId = e.target.dataset.catid;
+                document.querySelectorAll('.library-folder').forEach(f => f.style.display = 'none');
+                document.getElementById(`folder-${catId}`).style.display = 'block';
+            }
+        });
+
+        // Mezclador RGB Logic
+        const rangeR = document.getElementById('rangeR');
+        const rangeG = document.getElementById('rangeG');
+        const rangeB = document.getElementById('rangeB');
+        const mixerPreviewBox = document.getElementById('mixerPreviewBox');
+        const mixerHexText = document.getElementById('mixerHexText');
+
+        function rgbToHex(r, g, b) {
+            return "#" + [r, g, b].map(x => {
+                const hex = parseInt(x).toString(16);
+                return hex.length === 1 ? "0" + hex : hex;
+            }).join("").toUpperCase();
+        }
+
+        function updateMixer() {
+            const r = rangeR.value;
+            const g = rangeG.value;
+            const b = rangeB.value;
+            document.getElementById('rVal').textContent = r;
+            document.getElementById('gVal').textContent = g;
+            document.getElementById('bVal').textContent = b;
+
+            const hex = rgbToHex(r, g, b);
+            mixerPreviewBox.style.backgroundColor = hex;
+            mixerHexText.textContent = hex;
+            
+            const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+            mixerHexText.style.color = brightness > 125 ? '#000' : '#fff';
+        }
+
+        [rangeR, rangeG, rangeB].forEach(slider => slider.addEventListener('input', updateMixer));
+
+        document.getElementById('copyMixedBtn').addEventListener('click', () => copyToClipboard(mixerHexText.textContent));
+        document.getElementById('exportCssMixedBtn').addEventListener('click', () => exportCss(mixerHexText.textContent));
+        document.getElementById('saveMixedColorBtn').addEventListener('click', () => saveToFavs('Color Mezclado 🧪', mixerHexText.textContent));
+
+        // Generador de Paletas Armónicas
+        function getRandomHex() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+        function generateHarmonicPalette() {
+            const grid = document.getElementById('generatorGrid');
+            grid.innerHTML = '';
+            
+            for(let i = 1; i <= 4; i++) {
+                const hex = getRandomHex();
+                grid.innerHTML += `
+                    <div class="color-item">
+                        <div class="color-preview" style="background-color: ${hex};" onclick="copyToClipboard('${hex}')"></div>
+                        <div class="color-details">
+                            <span class="color-name">Tono Armónico ${i}</span>
+                            <span class="color-hex">${hex}</span>
+                            <div class="action-row">
+                                <button class="chip-btn" onclick="copyToClipboard('${hex}')">Copiar</button>
+                                <button class="chip-btn" onclick="saveToFavs('Armónico ${i}', '${hex}')">⭐</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            showToast("¡Nueva paleta generada con éxito! 🪄");
+        }
+
+        document.getElementById('generatePaletteBtn').addEventListener('click', generateHarmonicPalette);
+
+        // Funciones Globales
+        window.copyToClipboard = function(hex) {
+            navigator.clipboard.writeText(hex).then(() => showToast(`¡Copiado: ${hex}! 📋`));
+        }
+
+        window.exportCss = function(hex) {
+            const cssCode = `--custom-color: ${hex};`;
+            navigator.clipboard.writeText(cssCode).then(() => showToast(`¡CSS Copiado: ${cssCode} 💻`));
+        }
+
+        window.saveToFavs = function(name, hex) {
+            if(!currentUser) {
+                loginModal.classList.add('active');
+                showToast("⚠️ Inicia sesión primero para guardar favoritos.");
+                return;
+            }
+            if(!userFavorites.some(f => f.hex === hex)) {
+                userFavorites.push({ name, hex });
+                localStorage.setItem('colorStudioFavs', JSON.stringify(userFavorites));
+                renderFavorites();
+                showToast(`¡"${name}" guardado en tu perfil! ⭐`);
+            } else {
+                showToast("Este color ya está en tu colección.");
+            }
+        }
+
+        function renderFavorites() {
+            const grid = document.getElementById('favoritesGrid');
+            const desc = document.getElementById('favDesc');
+            grid.innerHTML = '';
+
+            if(!currentUser) {
+                desc.textContent = "Inicia sesión con tu nombre usando el botón superior para ver tus colores guardados.";
+                return;
+            }
+
+            if(userFavorites.length === 0) {
+                desc.textContent = `${currentUser}, aún no tienes colores favoritos. ¡Agrega algunos desde las carpetas o el mezclador!`;
+                return;
+            }
+
+            desc.textContent = `Colección privada de ${currentUser}:`;
+            userFavorites.forEach(fav => {
+                grid.innerHTML += `
+                    <div class="color-item">
+                        <div class="color-preview" style="background-color: ${fav.hex};" onclick="copyToClipboard('${fav.hex}')"></div>
+                        <div class="color-details">
+                            <span class="color-name">${fav.name}</span>
+                            <span class="color-hex">${fav.hex}</span>
+                            <div class="action-row">
+                                <button class="chip-btn" onclick="copyToClipboard('${fav.hex}')">Copiar</button>
+                                <button class="chip-btn" onclick="exportCss('${fav.hex}')">CSS</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            });
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => { toast.classList.remove('show'); }, 2200);
+        }
+
+        // Inicialización del Sistema
+        initLibrary();
+        updateMixer();
+        updateAuthUI();
+        generateHarmonicPalette();
+    </script>
+</body>
+</html>
