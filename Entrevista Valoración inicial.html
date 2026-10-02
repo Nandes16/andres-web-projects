@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valoración Inicial Inteligente - FitLab</title>
+    <style>
+        :root {
+            --primary: #1f3a60;
+            --secondary: #2b4c7e;
+            --accent: #d4a373;
+            --bg-body: #f4f6f9;
+            --card-bg: #ffffff;
+            --text-main: #2c3e50;
+            --text-muted: #7f8c8d;
+            --border-color: #e2e8f0;
+            --success-bg: #e6f4ea;
+            --success-text: #137333;
+            --warning-bg: #fef7e0;
+            --warning-text: #b06000;
+            --danger-bg: #fce8e6;
+            --danger-text: #c5221f;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            margin: 0;
+            padding: 30px;
+        }
+
+        .wrapper {
+            max-width: 950px;
+            margin: 0 auto;
+        }
+
+        .main-header {
+            text-align: center;
+            margin-bottom: 40px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .main-header h4 {
+            margin: 0 0 5px 0;
+            letter-spacing: 2px;
+            font-size: 13px;
+            color: var(--accent);
+        }
+
+        .main-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 26px;
+        }
+
+        .main-header p {
+            margin: 0;
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .folder-card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .folder-header {
+            padding: 20px 25px;
+            background-color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            border-left: 6px solid var(--accent);
+        }
+
+        .folder-header:hover {
+            background-color: #fafbfc;
+        }
+
+        .folder-title-area {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .step-badge {
+            background-color: var(--secondary);
+            color: white;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: bold;
+            font-size: 15px;
+        }
+
+        .folder-titles h3 {
+            margin: 0 0 4px 0;
+            font-size: 17px;
+            color: var(--primary);
+        }
+
+        .folder-titles p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--text-muted);
+            font-style: italic;
+        }
+
+        .toggle-icon {
+            font-size: 18px;
+            color: var(--text-muted);
+            transition: transform 0.3s ease;
+        }
+
+        .folder-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease-in-out, padding 0.3s ease;
+            padding: 0 25px;
+            background-color: #fff;
+            border-top: 1px solid transparent;
+        }
+
+        .folder-card.active .folder-content {
+            max-height: 2500px;
+            padding: 25px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .folder-card.active .toggle-icon {
+            transform: rotate(180deg);
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="date"],
+        select,
+        textarea {
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 14px;
+            background-color: #fcfdfd;
+            color: var(--text-main);
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: 0 0 0 3px rgba(43,76,126,0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            height: 90px;
+        }
+
+        .sub-section-title {
+            font-size: 14px;
+            font-weight: bold;
+            color: var(--secondary);
+            margin: 15px 0 10px 0;
+            border-bottom: 1px dashed var(--border-color);
+            padding-bottom: 5px;
+            grid-column: 1 / -1;
+        }
+
+        .checkbox-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            grid-column: 1 / -1;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 13px;
+            font-weight: normal;
+            cursor: pointer;
+        }
+
+        .checkbox-item input {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Insignias de referencia dinámica en vivo */
+        .live-feedback {
+            font-size: 12px;
+            font-weight: bold;
+            padding: 4px 8px;
+            border-radius: 4px;
+            margin-top: 4px;
+            display: inline-block;
+            width: fit-content;
+        }
+
+        .status-normal { background-color: var(--success-bg); color: var(--success-text); }
+        .status-warning { background-color: var(--warning-bg); color: var(--warning-text); }
+        .status-danger { background-color: var(--danger-bg); color: var(--danger-text); }
+        .status-neutral { background-color: #edf2f7; color: #4a5568; }
+
+        /* Panel de Resultados Automatizados */
+        .results-summary-card {
+            background: linear-gradient(135deg, #ffffff, #f8fafc);
+            border: 2px dashed var(--accent);
+            border-radius: 10px;
+            padding: 25px;
+            margin-top: 30px;
+        }
+
+        .results-summary-card h3 {
+            color: var(--primary);
+            margin-top: 0;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .summary-box {
+            background: white;
+            padding: 12px 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .summary-box span {
+            font-size: 11px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .summary-box p {
+            margin: 5px 0 0 0;
+            font-size: 15px;
+            font-weight: bold;
+            color: var(--secondary);
+        }
+
+        .submit-container {
+            text-align: center;
+            margin-top: 30px;
+        }
+
+        .btn-submit {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(212, 163, 115, 0.3);
+            transition: background 0.2s;
+        }
+
+        .btn-submit:hover {
+            background-color: #bc8e5f;
+        }
+    </style>
+</head>
+<body>
+
+<div class="wrapper">
+    <div class="main-header">
+        <h4>PANORAMA GENERAL</h4>
+        <h1>Componentes de la valoración inicial</h1>
+        <p>Sistema inteligente con procesamiento automático de datos, referencias y perfil integral[cite: 1].</p>
+    </div>
+
+    <form id="valoracionForm" onsubmit="event.preventDefault(); alert('¡Valoración procesada y guardada con éxito!');">
+
+        <!-- CARPETA 1: Anamnesis -->
+        <div class="folder-card active">
+            <div class="folder-header" onclick="toggleFolder(this)">
+                <div class="folder-title-area">
+                    <span class="step-badge">1</span>
+                    <div class="folder-titles">
+                        <h3>Anamnesis</h3>
+                        <p>Entrevista inicial: datos personales, objetivos y hábitos</p>
+                    </div>
+                </div>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="folder-content">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Nombre y Apellidos:</label>
+                        <input type="text" id="inpNombre" placeholder="Ej. Carlos Andrés Pérez" oninput="actualizarResumen()">
+                    </div>
+                    <div class="form-group">
+                        <label>Fecha de Nacimiento / Edad:</label>
+                        <input type="date" id="inpEdad" oninput="actualizarResumen()">
+                    </div>
+                    <div class="form-group">
+                        <label>Ocupación / Estilo de vida:</label>
+                        <input type="text" placeholder="Estudiante, administrativo, activo...">
+                    </div>
+                    <div class="form-group">
+                        <label>Disponibilidad horaria:</label>
+                        <input type="text" placeholder="Ej. Lunes a Viernes 1 hora">
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Objetivos principales:</label>
+                        <textarea placeholder="¿Qué metas busca alcanzar? (Hipertrofia, rendimiento, salud)"></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Evaluación de hábitos (Nutrición, descanso e hidratación):</label>
+                        <textarea placeholder="¿Cuántas horas duerme? ¿Cómo califica su alimentación?"></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARPETA 2: Historial clínico -->
+        <div class="folder-card">
+            <div class="folder-header" onclick="toggleFolder(this)">
+                <div class="folder-title-area">
+                    <span class="step-badge">2</span>
+                    <div class="folder-titles">
+                        <h3>Historial clínico</h3>
+                        <p>Antecedentes de salud, lesiones y medicación</p>
+                    </div>
+                </div>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="folder-content">
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Antecedentes médicos:</label>
+                        <textarea placeholder="Patologías crónicas, hipertensión, cirugías previas..."></textarea>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Lesiones osteomusculares (Actuales o pasadas):</label>
+                        <textarea placeholder="Detallar zona corporal y estado actual."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Medicación o suplementación:</label>
+                        <input type="text" placeholder="Nombre y dosis">
+                    </div>
+                    <div class="form-group">
+                        <label>Limitaciones médicas para el esfuerzo:</label>
+                        <input type="text" placeholder="¿Alguna restricción del médico?">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARPETA 3: Cuestionarios de aptitud -->
+        <div class="folder-card">
+            <div class="folder-header" onclick="toggleFolder(this)">
+                <div class="folder-title-area">
+                    <span class="step-badge">3</span>
+                    <div class="folder-titles">
+                        <h3>Cuestionarios de aptitud</h3>
+                        <p>PAR-Q y consentimiento informado</p>
+                    </div>
+                </div>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="folder-content">
+                <div class="form-grid">
+                    <div class="sub-section-title">Cuestionario PAR-Q (Alerta de restricciones)</div>
+                    <div class="checkbox-grid">
+                        <label class="checkbox-item"><input type="checkbox" class="parq-check" onchange="verificarParq()"> 1. ¿Alguna vez un médico le ha diagnosticado un problema cardíaco?</label>
+                        <label class="checkbox-item"><input type="checkbox" class="parq-check" onchange="verificarParq()"> 2. ¿Siente dolor en el pecho al realizar actividades físicas?</label>
+                        <label class="checkbox-item"><input type="checkbox" class="parq-check" onchange="verificarParq()"> 3. ¿En el último mes ha sentido dolor en el pecho sin esfuerzo?</label>
+                        <label class="checkbox-item"><input type="checkbox" class="parq-check" onchange="verificarParq()"> 4. ¿Pierde el equilibrio por mareos o desmayos?</label>
+                        <label class="checkbox-item"><input type="checkbox" class="parq-check" onchange="verificarParq()"> 5. ¿Tiene problemas óseos/articulares que empeoren con ejercicio?</label>
+                        <label class="checkbox-item"><input type="checkbox" class="parq-check" onchange="verificarParq()"> 6. ¿Toma medicamentos para presión arterial o corazón?</label>
+                        <label class="checkbox-item"><input type="checkbox" class="parq-check" onchange="verificarParq()"> 7. ¿Conoce otra razón para no hacer ejercicio?</label>
+                    </div>
+                    <div id="parqFeedback" class="live-feedback status-neutral" style="margin-top: 15px;">Estado PAR-Q: Apto para iniciar actividad física sin restricciones aparentes.</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARPETA 4: Valoración antropométrica -->
+        <div class="folder-card">
+            <div class="folder-header" onclick="toggleFolder(this)">
+                <div class="folder-title-area">
+                    <span class="step-badge">4</span>
+                    <div class="folder-titles">
+                        <h3>Valoración antropométrica</h3>
+                        <p>Peso, talla, IMC, % graso, perímetros</p>
+                    </div>
+                </div>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="folder-content">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Peso corporal (kg):</label>
+                        <input type="number" step="0.1" id="inpPeso" placeholder="Ej. 72.5" oninput="calcularAntropometria()">
+                    </div>
+                    <div class="form-group">
+                        <label>Talla / Estatura (cm):</label>
+                        <input type="number" step="0.1" id="inpTalla" placeholder="Ej. 175" oninput="calcularAntropometria()">
+                    </div>
+                    <div class="form-group">
+                        <label>Índice de Masa Corporal (IMC):</label>
+                        <input type="text" id="outImc" placeholder="Automático" readonly style="background-color: #edf2f7; font-weight: bold;">
+                        <div id="imcFeedback" class="live-feedback status-neutral">Ingrese peso y talla</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Porcentaje de Grasa Corporal (%):</label>
+                        <input type="number" step="0.1" id="inpGrasa" placeholder="Ej. 15.4" oninput="calcularGrasa()">
+                        <div id="grasaFeedback" class="live-feedback status-neutral">Sin evaluar</div>
+                    </div>
+                    <div class="form-group full-width">
+                        <label>Perímetros corporales (cm):</label>
+                        <textarea placeholder="Cintura, Cadera, Bíceps, Muslo..."></textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARPETA 5: Valoración postural y física -->
+        <div class="folder-card">
+            <div class="folder-header" onclick="toggleFolder(this)">
+                <div class="folder-title-area">
+                    <span class="step-badge">5</span>
+                    <div class="folder-titles">
+                        <h3>Valoración postural y física</h3>
+                        <p>Postura, fuerza, resistencia, flexibilidad</p>
+                    </div>
+                </div>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="folder-content">
+                <div class="form-grid">
+                    <div class="form-group full-width">
+                        <label>Análisis de alineación postural:</label>
+                        <textarea placeholder="Observaciones de hombros, columna, rodillas..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Evaluación de Fuerza:</label>
+                        <input type="text" placeholder="Ej. Dinamometría / Test de fuerza">
+                    </div>
+                    <div class="form-group">
+                        <label>Evaluación de Flexibilidad / ROM:</label>
+                        <input type="text" placeholder="Ej. Test de Wells o movilidad articular">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CARPETA 6: Signos vitales -->
+        <div class="folder-card">
+            <div class="folder-header" onclick="toggleFolder(this)">
+                <div class="folder-title-area">
+                    <span class="step-badge">6</span>
+                    <div class="folder-titles">
+                        <h3>Signos vitales</h3>
+                        <p>Frecuencia cardíaca y tensión arterial en reposo</p>
+                    </div>
+                </div>
+                <span class="toggle-icon">▼</span>
+            </div>
+            <div class="folder-content">
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>Frecuencia Cardíaca en Reposo (FCR - bpm):</label>
+                        <input type="number" id="inpFc" placeholder="Ej. 68" oninput="evaluarSignos()">
+                        <div id="fcFeedback" class="live-feedback status-neutral">Ingrese FCR</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Tensión Arterial Sistólica (mmHg):</label>
+                        <input type="number" id="inpTas" placeholder="Ej. 120" oninput="evaluarSignos()">
+                    </div>
+                    <div class="form-group">
+                        <label>Tensión Arterial Diastólica (mmHg):</label>
+                        <input type="number" id="inpTad" placeholder="Ej. 80" oninput="evaluarSignos()">
+                        <div id="taFeedback" class="live-feedback status-neutral">Ingrese Tensión Arterial</div>
+                    </div>
+                    <div class="form-group">
+                        <label>Saturación de Oxígeno (SpO2 %):</label>
+                        <input type="number" id="inpSpo2" placeholder="Ej. 98" oninput="evaluarSignos()">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- PANEL DE RESULTADOS AUTOMATIZADOS EN TIEMPO REAL -->
+        <div class="results-summary-card">
+            <h3>📊 Resumen y Diagnóstico Preliminar Automático</h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-top: 0;">Este bloque se actualiza en vivo con base en los datos ingresados en cada carpeta.</p>
+            <div class="summary-grid">
+                <div class="summary-box">
+                    <span>Evaluado:</span>
+                    <p id="sumNombre">Por registrar</p>
+                </div>
+                <div class="summary-box">
+                    <span>Clasificación IMC:</span>
+                    <p id="sumImc">Pendiente</p>
+                </div>
+                <div class="summary-box">
+                    <span>Estado PAR-Q:</span>
+                    <p id="sumParq" style="color: var(--success-text);">Apto</p>
+                </div>
+                <div class="summary-box">
+                    <span>Estado Fisiológico (FCR/TA):</span>
+                    <p id="sumFisio">Pendiente</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="submit-container">
+            <button type="submit" class="btn-submit">Guardar Valoración Completa</button>
+        </div>
+
+    </form>
+</div>
+
+<!-- Script de Automatización y Referencias -->
+<script>
+    function toggleFolder(header) {
+        const card = header.parentElement;
+        card.classList.toggle('active');
+    }
+
+    function actualizarResumen() {
+        const nombre = document.getElementById('inpNombre').value;
+        document.getElementById('sumNombre').innerText = nombre ? nombre : 'Por registrar';
+    }
+
+    function verificarParq() {
+        const checks = document.querySelectorAll('.parq-check');
+        let marcado = false;
+        checks.forEach(chk => {
+            if(chk.checked) marcado = true;
+        });
+
+        const fb = document.getElementById('parqFeedback');
+        const sumParq = document.getElementById('sumParq');
+
+        if(marcado) {
+            fb.className = "live-feedback status-danger";
+            fb.innerText = "Alerta: Al menos una respuesta positiva. Requiere valoración médica previa antes de entrenar.";
+            sumParq.innerText = "Revisión Médica";
+            sumParq.style.color = "var(--danger-text)";
+        } else {
+            fb.className = "live-feedback status-normal";
+            fb.innerText = "Estado PAR-Q: Apto para iniciar actividad física sin restricciones aparentes.";
+            sumParq.innerText = "Apto";
+            sumParq.style.color = "var(--success-text)";
+        }
+    }
+
+    function calcularAntropometria() {
+        const peso = parseFloat(document.getElementById('inpPeso').value);
+        const tallaCm = parseFloat(document.getElementById('inpTalla').value);
+        const imcOut = document.getElementById('outImc');
+        const imcFb = document.getElementById('imcFeedback');
+        const sumImc = document.getElementById('sumImc');
+
+        if(peso > 0 && tallaCm > 0) {
+            const tallaM = tallaCm / 100;
+            const imc = peso / (tallaM * tallaM);
+            imcOut.value = imc.toFixed(2);
+
+            let clasificacion = "";
+            let claseCss = "";
+
+            if(imc < 18.5) {
+                clasificacion = "Bajo peso";
+                claseCss = "live-feedback status-warning";
+            } else if(imc >= 18.5 && imc < 25) {
+                clasificacion = "Peso normal (Saludable)";
+                claseCss = "live-feedback status-normal";
+            } else if(imc >= 25 && imc < 30) {
+                clasificacion = "Sobrepeso";
+                claseCss = "live-feedback status-warning";
+            } else {
+                clasificacion = "Obesidad";
+                claseCss = "live-feedback status-danger";
+            }
+
+            imcFb.className = claseCss;
+            imcFb.innerText = `Referencia OMS: ${clasificacion}`;
+            sumImc.innerText = clasificacion;
+        } else {
+            imcOut.value = "";
+            imcFb.className = "live-feedback status-neutral";
+            imcFb.innerText = "Ingrese peso y talla válidos";
+            sumImc.innerText = "Pendiente";
+        }
+    }
+
+    function calcularGrasa() {
+        const grasa = parseFloat(document.getElementById('inpGrasa').value);
+        const grasaFb = document.getElementById('grasaFeedback');
+
+        if(!isNaN(grasa)) {
+            if(grasa < 10) {
+                grasaFb.className = "live-feedback status-warning";
+                grasaFb.innerText = "Grasa baja / Atleta";
+            } else if(grasa >= 10 && grasa <= 20) {
+                grasaFb.className = "live-feedback status-normal";
+                grasaFb.innerText = "Rango saludable óptimo";
+            } else {
+                grasaFb.className = "live-feedback status-warning";
+                grasaFb.innerText = "Por encima del rango recomendado";
+            }
+        } else {
+            grasaFb.className = "live-feedback status-neutral";
+            grasaFb.innerText = "Sin evaluar";
+        }
+    }
+
+    function evaluarSignos() {
+        const fc = parseInt(document.getElementById('inpFc').value);
+        const tas = parseInt(document.getElementById('inpTas').value);
+        const tad = parseInt(document.getElementById('inpTad').value);
+        const fcFb = document.getElementById('fcFeedback');
+        const taFb = document.getElementById('taFeedback');
+        const sumFisio = document.getElementById('sumFisio');
+
+        // Referencia FCR
+        if(!isNaN(fc)) {
+            if(fc < 60) {
+                fcFb.className = "live-feedback status-normal";
+                fcFb.innerText = "Bradicardia leve / Excelente condición";
+            } else if(fc >= 60 && fc <= 100) {
+                fcFb.className = "live-feedback status-normal";
+                fcFb.innerText = "FCR Normal (Normocardia)";
+            } else {
+                fcFb.className = "live-feedback status-warning";
+                fcFb.innerText = "FCR Elevada (Taquicardia en reposo)";
+            }
+        } else {
+            fcFb.className = "live-feedback status-neutral";
+            fcFb.innerText = "Ingrese FCR";
+        }
+
+        // Referencia Tensión Arterial
+        if(!isNaN(tas) && !isNaN(tad)) {
+            if(tas < 120 && tad < 80) {
+                taFb.className = "live-feedback status-normal";
+                taFb.innerText = "Tensión Arterial Óptima / Normal";
+                sumFisio.innerText = "Óptimo / Normal";
+                sumFisio.style.color = "var(--success-text)";
+            } else if(tas >= 140 || tad >= 90) {
+                taFb.className = "live-feedback status-danger";
+                taFb.innerText = "Alerta: Valores de Hipertensión";
+                sumFisio.innerText = "Alerta TA";
+                sumFisio.style.color = "var(--danger-text)";
+            } else {
+                taFb.className = "live-feedback status-warning";
+                taFb.innerText = "Tensión limítrofe / Normal alta";
+                sumFisio.innerText = "Normal alta";
+                sumFisio.style.color = "var(--warning-text)";
+            }
+        } else {
+            taFb.className = "live-feedback status-neutral";
+            taFb.innerText = "Ingrese TAS y TAD";
+        }
+    }
+</script>
+
+</body>
+</html>
